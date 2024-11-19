@@ -16,6 +16,8 @@ private:
     int16_t _mapWidth;
     int16_t _mapHeight;
 
+    bool _mapExplorerIndicatorToggle;
+
 public:
     Camera() = default;
     Camera(Arduboy2 arduboy, int16_t x, int16_t y, int16_t maxX, int16_t maxY)
@@ -55,6 +57,17 @@ public:
         }
     }
 
+    void DrawMapExplorerIndicator()
+    {
+        if (_arduboy.everyXFrames(30))
+                _mapExplorerIndicatorToggle ^= 1; // toggle
+
+        if (_mapExplorerIndicatorToggle) {
+            _arduboy.setCursor(1, Arduboy2::height() - 8);
+            _arduboy.print("View Map");
+        }
+    }
+
     void DrawBall(Ball ball)
     {
         _arduboy.fillCircle(static_cast<int16_t>(ball.x) - _cameraX,
@@ -73,8 +86,8 @@ public:
     {
         float x = ball.x + cos(ball.direction) * 25;
 
-        // y is multiplied by -1 because we want 0 on the y-axis to be at the top
-        //   (to match screen coordinates behavior)
+        // multiplied by -1 so lower values are higher on the screen
+        //   to match screen coordinates behavior
         float y = ball.y + -(sin(ball.direction) * 25);
 
         _arduboy.drawLine(ball.x - _cameraX,

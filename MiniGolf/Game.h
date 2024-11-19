@@ -39,8 +39,10 @@ public:
         _camera.DrawMap(_map);
         _camera.DrawBall(_ball);
         _camera.DrawHole(_map.end);
-
         _camera.DrawAimHud(_ball);
+
+        if (_gameState == GameState::MapExplorer)
+            _camera.DrawMapExplorerIndicator();
     }
 
 private:
