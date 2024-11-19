@@ -39,6 +39,8 @@ public:
         _camera.DrawMap(_map);
         _camera.DrawBall(_ball);
         _camera.DrawHole(_map.end);
+
+        _camera.DrawAimHud(_ball);
     }
 
 private:
@@ -49,6 +51,10 @@ private:
             case GameState::GamePlay:
                 if (_arduboy.justPressed(B_BUTTON))
                     _gameState = GameState::MapExplorer;
+                if (_arduboy.pressed(LEFT_BUTTON))
+                    _ball.RotateDirection(0.02);
+                if (_arduboy.pressed(RIGHT_BUTTON))
+                    _ball.RotateDirection(-0.02);
                 break;
 
             case GameState::MapExplorer:

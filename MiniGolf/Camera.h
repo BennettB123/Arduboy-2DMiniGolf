@@ -93,6 +93,20 @@ public:
                             3);
     }
 
+    void DrawAimHud(Ball ball)
+    {
+        float x = ball.x + cos(ball.direction) * 25;
+
+        // y is multiplied by -1 because we want 0 on the y-axis to be at the top
+        //   (to match screen coordinates behavior)
+        float y = ball.y + -(sin(ball.direction) * 25);
+
+        _arduboy.drawLine(ball.x - _cameraX,
+                          ball.y - _cameraY,
+                          x - _cameraX,
+                          y - _cameraY);
+    }
+
 private:
     void KeepInBounds()
     {

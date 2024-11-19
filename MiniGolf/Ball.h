@@ -4,9 +4,20 @@ struct Ball
 {
     float x;
     float y;
-    float _velocity;
-    uint8_t _direction; // unit is brads (degrees but mapped to a 0-255 range)
+    float velocity;
+    float direction; // radians
 
     Ball() = default;
     Ball(float x, float y) : x(x), y(y) {}
+
+    void RotateDirection(float delta)
+    {
+        direction += delta;
+        if (direction < 0)
+            direction = TWO_PI + direction;
+        else if (direction > TWO_PI)
+            direction = direction - TWO_PI;
+
+        Serial.println(direction);
+    }
 };
