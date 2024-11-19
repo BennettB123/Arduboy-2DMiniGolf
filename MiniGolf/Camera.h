@@ -18,12 +18,16 @@ private:
 
 public:
     Camera() = default;
-    Camera(Arduboy2 arduboy, int16_t x, int16_t y, int16_t maxX, int16_t maxY) : _arduboy(arduboy), _cameraX(x), _cameraY(y), _mapWidth(maxX), _mapHeight(maxY) {}
-
-    void Set(int16_t x, int16_t y)
+    Camera(Arduboy2 arduboy, int16_t x, int16_t y, int16_t maxX, int16_t maxY)
+        : _arduboy(arduboy), _mapWidth(maxX), _mapHeight(maxY)
     {
-        _cameraX = x;
-        _cameraY = y;
+        FocusOn(x, y);
+    }
+
+    void FocusOn(int16_t x, int16_t y)
+    {
+        _cameraX = x - HalfScreenWidth;
+        _cameraY = y - HalfScreenHeight;
 
         KeepInBounds();
     }
@@ -73,7 +77,6 @@ public:
                 _arduboy.drawPixel(i - _cameraX, j - _cameraY);
             }
         }
-
     }
 
     void DrawBall(Ball ball)
@@ -93,7 +96,7 @@ public:
 private:
     void KeepInBounds()
     {
-        _cameraX = constrain(_cameraX, -HalfScreenWidth, _mapWidth - HalfScreenWidth);
-        _cameraY = constrain(_cameraY, -HalfScreenHeight, _mapHeight - HalfScreenHeight);
+        _cameraX = constrain(_cameraX, 0, _mapWidth - Arduboy2::width() + 1);
+        _cameraY = constrain(_cameraY, 0, _mapHeight - Arduboy2::height() + 1);
     }
 };
