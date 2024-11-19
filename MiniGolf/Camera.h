@@ -16,7 +16,7 @@ private:
     int16_t _mapWidth;
     int16_t _mapHeight;
 
-    bool _mapExplorerIndicatorToggle;
+    bool _mapExplorerIndicatorToggle = false;
 
 public:
     Camera() = default;
@@ -60,9 +60,10 @@ public:
     void DrawMapExplorerIndicator()
     {
         if (_arduboy.everyXFrames(30))
-                _mapExplorerIndicatorToggle ^= 1; // toggle
+            _mapExplorerIndicatorToggle = !_mapExplorerIndicatorToggle;
 
-        if (_mapExplorerIndicatorToggle) {
+        if (_mapExplorerIndicatorToggle)
+        {
             _arduboy.setCursor(1, Arduboy2::height() - 8);
             _arduboy.print("View Map");
         }

@@ -35,8 +35,6 @@ struct Ball
         velocity -= Friction * secondsDelta;
         if (velocity < 0)
             velocity = 0;
-
-        Serial.println(velocity);
     }
 
     bool Stopped() {
