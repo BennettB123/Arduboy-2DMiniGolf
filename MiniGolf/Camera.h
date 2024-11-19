@@ -32,30 +32,6 @@ public:
         KeepInBounds();
     }
 
-    void MoveUp()
-    {
-        _cameraY -= 2;
-        KeepInBounds();
-    }
-
-    void MoveDown()
-    {
-        _cameraY += 2;
-        KeepInBounds();
-    }
-
-    void MoveLeft()
-    {
-        _cameraX -= 2;
-        KeepInBounds();
-    }
-
-    void MoveRight()
-    {
-        _cameraX += 2;
-        KeepInBounds();
-    }
-
     void DrawMap(Map map)
     {
         // draw walls
@@ -105,6 +81,30 @@ public:
                           ball.y - _cameraY,
                           x - _cameraX,
                           y - _cameraY);
+    }
+
+    void MoveUp()
+    {
+        _cameraY -= 2;
+        KeepInBounds();
+    }
+
+    void MoveDown()
+    {
+        _cameraY += 2;
+        KeepInBounds();
+    }
+
+    void MoveLeft()
+    {
+        _cameraX -= 2;
+        KeepInBounds();
+    }
+
+    void MoveRight()
+    {
+        _cameraX += 2;
+        KeepInBounds();
     }
 
 private:
