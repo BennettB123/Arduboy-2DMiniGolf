@@ -1,5 +1,7 @@
 #pragma once
 
+constexpr float Friction = 40;
+
 struct Ball
 {
     float x;
@@ -17,7 +19,27 @@ struct Ball
             direction = TWO_PI + direction;
         else if (direction > TWO_PI)
             direction = direction - TWO_PI;
+    }
 
-        Serial.println(direction);
+    void StartHit() {
+        velocity = 120;
+    }
+
+    void Tick(float secondsDelta) {
+        float xDelta = secondsDelta * cos(direction) * velocity;
+        float yDelta = -(secondsDelta * sin(direction) * velocity);
+
+        x += xDelta;
+        y += yDelta;
+
+        velocity -= Friction * secondsDelta;
+        if (velocity < 0)
+            velocity = 0;
+
+        Serial.println(velocity);
+    }
+
+    bool Stopped() {
+        return velocity == 0;
     }
 };

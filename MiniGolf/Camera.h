@@ -85,9 +85,6 @@ public:
     void DrawAimHud(Ball ball)
     {
         float x = ball.x + cos(ball.direction) * 25;
-
-        // multiplied by -1 so lower values are higher on the screen
-        //   to match screen coordinates behavior
         float y = ball.y + -(sin(ball.direction) * 25);
 
         _arduboy.drawLine(ball.x - _cameraX,
