@@ -73,7 +73,7 @@ public:
     {
         _arduboy.fillCircle(static_cast<int16_t>(ball.x) - _cameraX,
                             static_cast<int16_t>(ball.y) - _cameraY,
-                            2);
+                            Ball::Radius);
     }
 
     void DrawHole(const Point &hole)

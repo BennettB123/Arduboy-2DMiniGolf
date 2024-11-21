@@ -1,13 +1,18 @@
 #pragma once
 
-constexpr float Friction = 40;
+#include <Arduboy2.h>
+#include "Vector.h"
 
 struct Ball
 {
     float x;
     float y;
-    float velocity;
-    float direction; // radians
+    Vector velocity; // used for when the ball is in motion
+    float direction; // only used for choosing which direction to hit the ball
+
+    static constexpr uint8_t Radius = 2;
+    static constexpr float Friction = 0.95;
+    static constexpr float MinVelocityCutoff = 1;
 
     Ball() = default;
     Ball(float x, float y) : x(x), y(y) {}
@@ -22,22 +27,27 @@ struct Ball
     }
 
     void StartHit() {
-        velocity = 120;
+        float power = 100;
+        velocity.x = cos(direction) * power;
+        velocity.y = -sin(direction) * power;
     }
 
     void Tick(float secondsDelta) {
-        float xDelta = secondsDelta * cos(direction) * velocity;
-        float yDelta = -(secondsDelta * sin(direction) * velocity);
+        x += velocity.x * secondsDelta;
+        y += velocity.y * secondsDelta;
 
-        x += xDelta;
-        y += yDelta;
+        // apply friction
+        velocity.x -= (velocity.x * Friction) * secondsDelta;
+        velocity.y -= (velocity.y * Friction) * secondsDelta;
 
-        velocity -= Friction * secondsDelta;
-        if (velocity < 0)
-            velocity = 0;
+        // check for minimum velocity cutoff
+        if (abs(velocity.x) <= MinVelocityCutoff)
+            velocity.x = 0;
+        if (abs(velocity.y) <= MinVelocityCutoff)
+            velocity.y = 0;
     }
 
     bool Stopped() {
-        return velocity == 0;
+        return velocity.x == 0 && velocity.y == 0;
     }
 };
