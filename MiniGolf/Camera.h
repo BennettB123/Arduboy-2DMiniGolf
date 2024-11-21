@@ -34,7 +34,7 @@ public:
         KeepInBounds();
     }
 
-    void DrawMap(Map map)
+    void DrawMap(const Map &map)
     {
         // draw walls
         for (uint8_t i = 0; i < MaxNumWalls; i++)
@@ -69,21 +69,21 @@ public:
         }
     }
 
-    void DrawBall(Ball ball)
+    void DrawBall(const Ball &ball)
     {
         _arduboy.fillCircle(static_cast<int16_t>(ball.x) - _cameraX,
                             static_cast<int16_t>(ball.y) - _cameraY,
                             2);
     }
 
-    void DrawHole(Point hole)
+    void DrawHole(const Point &hole)
     {
         _arduboy.fillCircle(hole.x - _cameraX,
                             hole.y - _cameraY,
                             3);
     }
 
-    void DrawAimHud(Ball ball)
+    void DrawAimHud(const Ball &ball)
     {
         float x = ball.x + cos(ball.direction) * 25;
         float y = ball.y + -(sin(ball.direction) * 25);
