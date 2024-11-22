@@ -54,7 +54,7 @@ public:
         _camera.DrawBall(_ball);
         _camera.DrawHole(_map.end);
 
-        if (_gameState == GameState::Aiming)
+        if (_gameState == GameState::Aiming || _gameState == GameState::MapExplorer)
             _camera.DrawAimHud(_ball);
 
         if (_gameState == GameState::MapExplorer)
@@ -78,6 +78,10 @@ private:
                     _ball.RotateDirection(0.02);
                 if (_arduboy.pressed(RIGHT_BUTTON))
                     _ball.RotateDirection(-0.02);
+                if (_arduboy.pressed(UP_BUTTON))
+                    _ball.IncreasePower(secondsDelta);
+                if (_arduboy.pressed(DOWN_BUTTON))
+                    _ball.DecreasePower(secondsDelta);
                 break;
 
             case GameState::MapExplorer:

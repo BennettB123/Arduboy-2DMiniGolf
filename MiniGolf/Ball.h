@@ -6,16 +6,21 @@
 struct Ball
 {
     float x, y;
-    Vector velocity; // used for when the ball is in motion
-    float direction; // only used for choosing which direction to hit the ball
+    Vector velocity;    // used for when the ball is in motion
+    float direction;    // used for choosing which direction to hit the ball
+    float power = (MaxPower + MinPower) / 2;    // how hard to hit the ball
 
     static constexpr uint8_t Radius = 2;
     static constexpr float Friction = .60;           // percentage to reduce velocity by every second
     static constexpr float MinVelocityThreshold = 3; // stop the ball when velocity is below this threshold
+    static constexpr uint8_t MaxPower = 150;
+    static constexpr uint8_t MinPower = 25;
+    static constexpr uint8_t PowerChangePerSecond = 50;
 
     Ball() = default;
     Ball(float x, float y) : x(x), y(y) {}
 
+    // TODO: take into account secondsDelta
     void RotateDirection(float delta)
     {
         direction += delta;
@@ -25,9 +30,20 @@ struct Ball
             direction = direction - TWO_PI;
     }
 
+    void IncreasePower(float secondsDelta)
+    {
+        power += PowerChangePerSecond * secondsDelta;
+        power = constrain(power, MinPower, MaxPower);
+    }
+
+    void DecreasePower(float secondsDelta)
+    {
+        power -= PowerChangePerSecond * secondsDelta;
+        power = constrain(power, MinPower, MaxPower);
+    }
+
     void StartHit()
     {
-        float power = 150;
         velocity.x = cos(direction) * power;
         velocity.y = -sin(direction) * power;
     }

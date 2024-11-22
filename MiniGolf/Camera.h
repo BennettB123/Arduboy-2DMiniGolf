@@ -4,8 +4,6 @@
 #include "Map.h"
 #include <Arduboy2.h>
 
-constexpr uint8_t HalfScreenWidth = Arduboy2::width() / 2;
-constexpr uint8_t HalfScreenHeight = Arduboy2::height() / 2;
 
 class Camera
 {
@@ -15,8 +13,12 @@ private:
     int16_t _cameraY;
     int16_t _mapWidth;
     int16_t _mapHeight;
-
     bool _mapExplorerIndicatorToggle = false;
+
+    static constexpr uint8_t HalfScreenWidth = Arduboy2::width() / 2;
+    static constexpr uint8_t HalfScreenHeight = Arduboy2::height() / 2;
+    static constexpr uint8_t MaxPowerLineLength = 40;
+    static constexpr uint8_t MinPowerLineLength = 10;
 
 public:
     Camera() = default;
@@ -85,8 +87,10 @@ public:
 
     void DrawAimHud(const Ball &ball)
     {
-        float x = ball.x + cos(ball.direction) * 25;
-        float y = ball.y + -(sin(ball.direction) * 25);
+        float lineLength = map(ball.power, Ball::MinPower, Ball::MaxPower, MinPowerLineLength, MaxPowerLineLength);
+
+        float x = ball.x + cos(ball.direction) * lineLength;
+        float y = ball.y + -(sin(ball.direction) * lineLength);
 
         _arduboy.drawLine(ball.x - _cameraX,
                           ball.y - _cameraY,
