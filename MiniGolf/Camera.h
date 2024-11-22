@@ -49,7 +49,7 @@ public:
                               p2.y - _cameraY);
         }
 
-        // draw texture
+        // draw texture (dots on ground)
         for (int i = 0; i < _mapWidth; i += 15)
         {
             for (int j = 0; j < _mapHeight; j += 15)
@@ -57,6 +57,8 @@ public:
                 _arduboy.drawPixel(i - _cameraX, j - _cameraY);
             }
         }
+
+        DrawHole(map.end);
     }
 
     void DrawMapExplorerIndicator()
@@ -76,13 +78,6 @@ public:
         _arduboy.fillCircle(static_cast<int16_t>(ball.x) - _cameraX,
                             static_cast<int16_t>(ball.y) - _cameraY,
                             Ball::Radius);
-    }
-
-    void DrawHole(const Point &hole)
-    {
-        _arduboy.fillCircle(hole.x - _cameraX,
-                            hole.y - _cameraY,
-                            3);
     }
 
     void DrawAimHud(const Ball &ball)
@@ -123,6 +118,13 @@ public:
     }
 
 private:
+    void DrawHole(const Point &hole)
+    {
+        _arduboy.drawCircle(hole.x - _cameraX,
+                            hole.y - _cameraY,
+                            Map::HoleRadius);
+    }
+
     void KeepInBounds()
     {
         _cameraX = constrain(_cameraX, 0, _mapWidth - Arduboy2::width() + 1);

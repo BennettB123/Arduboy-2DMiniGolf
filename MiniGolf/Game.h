@@ -52,10 +52,9 @@ public:
     {
         _camera.DrawMap(_map);
         _camera.DrawBall(_ball);
-        _camera.DrawHole(_map.end);
 
         if (_gameState == GameState::Aiming || _gameState == GameState::MapExplorer)
-            _camera.DrawAimHud(_ball);
+        _camera.DrawAimHud(_ball);
 
         if (_gameState == GameState::MapExplorer)
             _camera.DrawMapExplorerIndicator();

@@ -24,6 +24,8 @@ typedef struct Map
     Point start;
     Point end;
     Wall walls[MaxNumWalls];
+
+    static constexpr uint8_t HoleRadius = 3;
 };
 
 Map GetMap1()
