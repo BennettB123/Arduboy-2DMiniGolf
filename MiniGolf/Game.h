@@ -2,6 +2,7 @@
 
 #include "Ball.h"
 #include "Camera.h"
+#include "CollisionHandler.h"
 #include "Map.h"
 #include <Arduboy2.h>
 
@@ -36,7 +37,9 @@ public:
 
         if (_gameState == GameState::BallInMotion)
         {
-            _ball.Tick(secondsDelta);
+            _ball.Move(secondsDelta);
+            CollisionHandler::HandleCollisions(_ball, _map);
+
             if (_ball.Stopped())
                 _gameState = GameState::Aiming;
         }

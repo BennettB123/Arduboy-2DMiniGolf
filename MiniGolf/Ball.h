@@ -1,18 +1,17 @@
 #pragma once
 
-#include <Arduboy2.h>
 #include "Vector.h"
+#include <Arduboy2.h>
 
 struct Ball
 {
-    float x;
-    float y;
+    float x, y;
     Vector velocity; // used for when the ball is in motion
     float direction; // only used for choosing which direction to hit the ball
 
     static constexpr uint8_t Radius = 2;
-    static constexpr float Friction = 0.95;
-    static constexpr float MinVelocityCutoff = 1;
+    static constexpr float Friction = .60;           // percentage to reduce velocity by every second
+    static constexpr float MinVelocityThreshold = 3; // stop the ball when velocity is below this threshold
 
     Ball() = default;
     Ball(float x, float y) : x(x), y(y) {}
@@ -26,28 +25,27 @@ struct Ball
             direction = direction - TWO_PI;
     }
 
-    void StartHit() {
-        float power = 100;
+    void StartHit()
+    {
+        float power = 150;
         velocity.x = cos(direction) * power;
         velocity.y = -sin(direction) * power;
     }
 
-    void Tick(float secondsDelta) {
+    void Move(float secondsDelta)
+    {
         x += velocity.x * secondsDelta;
         y += velocity.y * secondsDelta;
 
-        // apply friction
-        velocity.x -= (velocity.x * Friction) * secondsDelta;
-        velocity.y -= (velocity.y * Friction) * secondsDelta;
+        velocity.x -= velocity.x * Friction * secondsDelta;
+        velocity.y -= velocity.y * Friction * secondsDelta;
 
-        // check for minimum velocity cutoff
-        if (abs(velocity.x) <= MinVelocityCutoff)
-            velocity.x = 0;
-        if (abs(velocity.y) <= MinVelocityCutoff)
-            velocity.y = 0;
+        if (velocity.Length() < MinVelocityThreshold)
+            velocity = {0, 0};
     }
 
-    bool Stopped() {
+    bool Stopped()
+    {
         return velocity.x == 0 && velocity.y == 0;
     }
 };

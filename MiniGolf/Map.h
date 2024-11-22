@@ -39,17 +39,18 @@ Map GetMap1()
         .walls =
             {
                 // Border
-                Wall(0, 0, width, 0),     // top border
-                Wall(width, 0, width, height), // right border
+                // TODO: remove border walls and have it just be implicit
+                Wall(0, 0, width, 0),           // top border
+                Wall(width, 0, width, height),  // right border
                 Wall(0, height, width, height), // bottom border
-                Wall(0, 0, 0, height),     // left border
+                Wall(0, 0, 0, height),          // left border
 
                 // Triangle 1
                 Wall(32, 32, 60, 60),
                 Wall(32, 32, 60, 32),
                 Wall(60, 32, 60, 60),
 
-                // Square 1
+                // Polygon 1
                 Wall(85, 75, 110, 75),
                 Wall(110, 75, 100, 100),
                 Wall(100, 100, 75, 100),
