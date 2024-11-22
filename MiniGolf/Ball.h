@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Vector.h"
-#include <Arduboy2.h>
 
 struct Ball
 {

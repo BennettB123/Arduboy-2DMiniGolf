@@ -4,7 +4,6 @@
 #include "Camera.h"
 #include "CollisionHandler.h"
 #include "Map.h"
-#include <Arduboy2.h>
 
 enum class GameState
 {
@@ -16,14 +15,14 @@ enum class GameState
 class Game
 {
 private:
-    Arduboy2 _arduboy;
+    ArduboyG _arduboy;
     Map _map;
     Camera _camera;
     Ball _ball;
     GameState _gameState;
 
 public:
-    Game(Arduboy2 arduboy) : _arduboy(arduboy)
+    Game(ArduboyG arduboy) : _arduboy(arduboy)
     {
         _map = GetMap1();
         _camera = Camera(_arduboy, 0, 0, _map.width, _map.height);

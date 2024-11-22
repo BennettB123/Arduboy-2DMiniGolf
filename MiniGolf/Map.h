@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Arduboy2.h>
+#include "ArduboyG.h"
 
 constexpr uint8_t MaxNumWalls = 20;
 

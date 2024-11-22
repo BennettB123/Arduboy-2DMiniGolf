@@ -1,28 +1,27 @@
 #pragma once
 
+#include "ArduboyG.h"
 #include "Ball.h"
 #include "Map.h"
-#include <Arduboy2.h>
-
 
 class Camera
 {
 private:
-    Arduboy2 _arduboy;
+    ArduboyG _arduboy;
     int16_t _cameraX;
     int16_t _cameraY;
     int16_t _mapWidth;
     int16_t _mapHeight;
     bool _mapExplorerIndicatorToggle = false;
 
-    static constexpr uint8_t HalfScreenWidth = Arduboy2::width() / 2;
-    static constexpr uint8_t HalfScreenHeight = Arduboy2::height() / 2;
+    static constexpr uint8_t HalfScreenWidth = ArduboyG::width() / 2;
+    static constexpr uint8_t HalfScreenHeight = ArduboyG::height() / 2;
     static constexpr uint8_t MaxPowerLineLength = 40;
     static constexpr uint8_t MinPowerLineLength = 10;
 
 public:
     Camera() = default;
-    Camera(Arduboy2 arduboy, int16_t x, int16_t y, int16_t maxX, int16_t maxY)
+    Camera(ArduboyG arduboy, int16_t x, int16_t y, int16_t maxX, int16_t maxY)
         : _arduboy(arduboy), _mapWidth(maxX), _mapHeight(maxY)
     {
         FocusOn(x, y);
@@ -46,7 +45,8 @@ public:
             _arduboy.drawLine(p1.x - _cameraX,
                               p1.y - _cameraY,
                               p2.x - _cameraX,
-                              p2.y - _cameraY);
+                              p2.y - _cameraY,
+                              LIGHT_GRAY);
         }
 
         // draw texture (dots on ground)
@@ -54,7 +54,7 @@ public:
         {
             for (int j = 0; j < _mapHeight; j += 15)
             {
-                _arduboy.drawPixel(i - _cameraX, j - _cameraY);
+                _arduboy.drawPixel(i - _cameraX, j - _cameraY, LIGHT_GRAY);
             }
         }
 
@@ -63,12 +63,17 @@ public:
 
     void DrawMapExplorerIndicator()
     {
-        if (_arduboy.everyXFrames(30))
-            _mapExplorerIndicatorToggle = !_mapExplorerIndicatorToggle;
+        // if (_arduboy.everyXFrames(30)) {
+        //     _mapExplorerIndicatorToggle = !_mapExplorerIndicatorToggle;
+        //     Serial.println("toggle");
+        // }
+
+        _mapExplorerIndicatorToggle = true;
 
         if (_mapExplorerIndicatorToggle)
         {
-            _arduboy.setCursor(1, Arduboy2::height() - 8);
+            _arduboy.setTextColor(DARK_GRAY);
+            _arduboy.setCursor(1, ArduboyG::height() - 8);
             _arduboy.print("View Map");
         }
     }
@@ -90,7 +95,8 @@ public:
         _arduboy.drawLine(ball.x - _cameraX,
                           ball.y - _cameraY,
                           x - _cameraX,
-                          y - _cameraY);
+                          y - _cameraY,
+                          WHITE);
     }
 
     void MoveUp()
@@ -120,14 +126,15 @@ public:
 private:
     void DrawHole(const Point &hole)
     {
-        _arduboy.drawCircle(hole.x - _cameraX,
+        _arduboy.fillCircle(hole.x - _cameraX,
                             hole.y - _cameraY,
-                            Map::HoleRadius);
+                            Map::HoleRadius,
+                            LIGHT_GRAY);
     }
 
     void KeepInBounds()
     {
-        _cameraX = constrain(_cameraX, 0, _mapWidth - Arduboy2::width() + 1);
-        _cameraY = constrain(_cameraY, 0, _mapHeight - Arduboy2::height() + 1);
+        _cameraX = constrain(_cameraX, 0, _mapWidth - ArduboyG::width() + 1);
+        _cameraY = constrain(_cameraY, 0, _mapHeight - ArduboyG::height() + 1);
     }
 };

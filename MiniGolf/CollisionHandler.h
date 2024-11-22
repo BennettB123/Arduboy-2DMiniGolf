@@ -2,7 +2,6 @@
 
 #include "Ball.h"
 #include "Map.h"
-#include <Arduboy2.h>
 
 class CollisionHandler
 {
