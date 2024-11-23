@@ -14,6 +14,7 @@ private:
     int16_t _mapHeight;
     bool _textFlashToggle = false;
 
+    static constexpr uint8_t FontWidth = 5;
     static constexpr uint8_t HalfScreenWidth = Arduboy2::width() / 2;
     static constexpr uint8_t HalfScreenHeight = Arduboy2::height() / 2;
     static constexpr uint8_t MaxPowerLineLength = 40;
@@ -60,18 +61,6 @@ public:
         DrawHole(map.end);
     }
 
-    void DrawMapExplorerIndicator()
-    {
-        if (_arduboy.everyXFrames(30))
-            _textFlashToggle = !_textFlashToggle;
-
-        if (_textFlashToggle)
-        {
-            _arduboy.setCursor(1, Arduboy2::height() - 8);
-            _arduboy.print(F("View Map"));
-        }
-    }
-
     void DrawBall(const Ball &ball)
     {
         _arduboy.fillCircle(static_cast<int16_t>(ball.x) - _cameraX,
@@ -92,19 +81,38 @@ public:
                           y - _cameraY);
     }
 
-    void DrawHoleCompleteHud()
+    void DrawMapSummary(const Map &map)
     {
-        // uses "magic numbers" to center the text
-        _arduboy.setCursor(53, 15);
-        _arduboy.setTextSize(1);
-        _arduboy.println(F("Hole"));
-        _arduboy.setCursorX(40);
-        _arduboy.println(F("Complete!"));
-        _arduboy.setTextSize(1);
-        _arduboy.setCursorX(18);
-        _arduboy.println(F("Press any button"));
-        _arduboy.setCursorX(36);
-        _arduboy.print(F("to restart"));
+        _arduboy.setCursorY(25);
+        PrintlnCentered(map.name);
+        PrintlnCentered("par: " + String(map.par));
+    }
+
+    void DrawMapExplorerIndicator()
+    {
+        if (_arduboy.everyXFrames(30))
+            _textFlashToggle = !_textFlashToggle;
+
+        if (_textFlashToggle)
+        {
+            _arduboy.setCursor(1, Arduboy2::height() - 8);
+            _arduboy.print(F("View Map"));
+        }
+    }
+
+    void DrawMapComplete(const Map &map, uint8_t strokes)
+    {
+        _arduboy.setCursorY(4);
+        PrintlnCentered(F("Hole"));
+        PrintlnCentered(F("Complete!"));
+
+        MoveCursorDown(5);
+        PrintlnCentered("par " + String(map.par));
+        PrintlnCentered("strokes: " + String(strokes));
+
+        MoveCursorDown(5);
+        PrintlnCentered(F("Press any button"));
+        PrintlnCentered(F("to restart"));
     }
 
     void MoveUp()
@@ -143,5 +151,19 @@ private:
     {
         _cameraX = constrain(_cameraX, 0, _mapWidth - Arduboy2::width() + 1);
         _cameraY = constrain(_cameraY, 0, _mapHeight - Arduboy2::height() + 1);
+    }
+
+    void PrintlnCentered(const String &text)
+    {
+        uint8_t textWidth = (text.length() * FontWidth);
+        textWidth += text.length() - 1; // include pixel between chars
+        uint8_t offset = HalfScreenWidth - (textWidth / 2);
+        _arduboy.setCursorX(offset);
+        _arduboy.println(text);
+    }
+
+    void MoveCursorDown(uint8_t offset)
+    {
+        _arduboy.setCursorY(_arduboy.getCursorY() + offset);
     }
 };

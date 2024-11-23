@@ -8,6 +8,7 @@
 
 enum class GameState
 {
+    MapSummary,
     Aiming,
     MapExplorer,
     BallInMotion,
@@ -22,6 +23,7 @@ private:
     Camera _camera;
     Ball _ball;
     GameState _gameState;
+    uint8_t _strokes;
 
 public:
     Game(Arduboy2 arduboy) : _arduboy(arduboy)
@@ -29,7 +31,7 @@ public:
         _map = GetMap1();
         _camera = Camera(_arduboy, 0, 0, _map.width, _map.height);
         _ball = Ball(static_cast<float>(_map.start.x), static_cast<float>(_map.start.y));
-        _gameState = GameState::Aiming;
+        _gameState = GameState::MapSummary;
     }
 
     void Reset()
@@ -38,6 +40,7 @@ public:
         _camera = Camera(_arduboy, 0, 0, _map.width, _map.height);
         _ball = Ball(static_cast<float>(_map.start.x), static_cast<float>(_map.start.y));
         _gameState = GameState::Aiming;
+        _strokes = 0;
     }
 
     void Tick(float secondsDelta)
@@ -71,6 +74,9 @@ public:
         _camera.DrawMap(_map);
         _camera.DrawBall(_ball);
 
+        if (_gameState == GameState::MapSummary)
+            _camera.DrawMapSummary(_map);
+
         if (_gameState == GameState::Aiming || _gameState == GameState::MapExplorer)
             _camera.DrawAimHud(_ball);
 
@@ -78,7 +84,7 @@ public:
             _camera.DrawMapExplorerIndicator();
 
         if (_gameState == GameState::HoleComplete)
-            _camera.DrawHoleCompleteHud();
+            _camera.DrawMapComplete(_map, _strokes);
     }
 
 private:
@@ -86,6 +92,9 @@ private:
     {
         switch (_gameState)
         {
+            case GameState::MapSummary:
+                if (AnyButtonPressed(_arduboy))
+                    _gameState = GameState::Aiming;
             case GameState::Aiming:
                 if (_arduboy.justPressed(B_BUTTON))
                     _gameState = GameState::MapExplorer;
@@ -93,6 +102,7 @@ private:
                 {
                     _gameState = GameState::BallInMotion;
                     _ball.StartHit();
+                    _strokes++;
                 }
                 if (_arduboy.pressed(LEFT_BUTTON))
                     _ball.RotateDirection(0.02);

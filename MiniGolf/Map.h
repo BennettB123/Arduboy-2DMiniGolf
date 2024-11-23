@@ -19,6 +19,8 @@ typedef struct Wall
 
 typedef struct Map
 {
+    char* name;
+    uint8_t par;
     int16_t width;
     int16_t height;
     Point start;
@@ -34,6 +36,8 @@ Map GetMap1()
     int16_t height = 125;
 
     return {
+        .name = "Map 1",
+        .par = 3,
         .width = width,
         .height = height,
         .start = Point(10, 10),
