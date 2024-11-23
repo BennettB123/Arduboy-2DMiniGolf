@@ -4,7 +4,6 @@
 #include "Map.h"
 #include <Arduboy2.h>
 
-
 class Camera
 {
 private:
@@ -13,7 +12,7 @@ private:
     int16_t _cameraY;
     int16_t _mapWidth;
     int16_t _mapHeight;
-    bool _mapExplorerIndicatorToggle = false;
+    bool _textFlashToggle = false;
 
     static constexpr uint8_t HalfScreenWidth = Arduboy2::width() / 2;
     static constexpr uint8_t HalfScreenHeight = Arduboy2::height() / 2;
@@ -64,12 +63,12 @@ public:
     void DrawMapExplorerIndicator()
     {
         if (_arduboy.everyXFrames(30))
-            _mapExplorerIndicatorToggle = !_mapExplorerIndicatorToggle;
+            _textFlashToggle = !_textFlashToggle;
 
-        if (_mapExplorerIndicatorToggle)
+        if (_textFlashToggle)
         {
             _arduboy.setCursor(1, Arduboy2::height() - 8);
-            _arduboy.print("View Map");
+            _arduboy.print(F("View Map"));
         }
     }
 
@@ -91,6 +90,21 @@ public:
                           ball.y - _cameraY,
                           x - _cameraX,
                           y - _cameraY);
+    }
+
+    void DrawHoleCompleteHud()
+    {
+        // uses "magic numbers" to center the text
+        _arduboy.setCursor(53, 15);
+        _arduboy.setTextSize(1);
+        _arduboy.println(F("Hole"));
+        _arduboy.setCursorX(40);
+        _arduboy.println(F("Complete!"));
+        _arduboy.setTextSize(1);
+        _arduboy.setCursorX(18);
+        _arduboy.println(F("Press any button"));
+        _arduboy.setCursorX(36);
+        _arduboy.print(F("to restart"));
     }
 
     void MoveUp()

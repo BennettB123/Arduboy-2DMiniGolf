@@ -18,6 +18,12 @@ public:
         }
     }
 
+    static bool BallInHole(Ball &ball, const Map &map)
+    {
+        float dist = Distance(ball.x, ball.y, map.end.x, map.end.y);
+        return dist <= Map::HoleRadius;
+    }
+
 private:
     static float Distance(float x1, float y1, float x2, float y2)
     {

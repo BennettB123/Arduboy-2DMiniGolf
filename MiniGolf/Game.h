@@ -11,6 +11,7 @@ enum class GameState
     Aiming,
     MapExplorer,
     BallInMotion,
+    HoleComplete
 };
 
 class Game
@@ -31,6 +32,14 @@ public:
         _gameState = GameState::Aiming;
     }
 
+    void Reset()
+    {
+        _map = GetMap1();
+        _camera = Camera(_arduboy, 0, 0, _map.width, _map.height);
+        _ball = Ball(static_cast<float>(_map.start.x), static_cast<float>(_map.start.y));
+        _gameState = GameState::Aiming;
+    }
+
     void Tick(float secondsDelta)
     {
         HandleInput(secondsDelta);
@@ -38,10 +47,19 @@ public:
         if (_gameState == GameState::BallInMotion)
         {
             _ball.Move(secondsDelta);
-            CollisionHandler::HandleCollisions(_ball, _map);
 
             if (_ball.Stopped())
                 _gameState = GameState::Aiming;
+
+            CollisionHandler::HandleCollisions(_ball, _map);
+
+            if (CollisionHandler::BallInHole(_ball, _map))
+            {
+                _ball.x = _map.end.x;
+                _ball.y = _map.end.y;
+                _ball.velocity = {0, 0};
+                _gameState = GameState::HoleComplete;
+            }
         }
 
         if (_gameState != GameState::MapExplorer)
@@ -54,10 +72,13 @@ public:
         _camera.DrawBall(_ball);
 
         if (_gameState == GameState::Aiming || _gameState == GameState::MapExplorer)
-        _camera.DrawAimHud(_ball);
+            _camera.DrawAimHud(_ball);
 
         if (_gameState == GameState::MapExplorer)
             _camera.DrawMapExplorerIndicator();
+
+        if (_gameState == GameState::HoleComplete)
+            _camera.DrawHoleCompleteHud();
     }
 
 private:
@@ -98,6 +119,20 @@ private:
                 if (_arduboy.pressed(RIGHT_BUTTON))
                     _camera.MoveRight();
                 break;
+
+            case GameState::HoleComplete:
+                if (AnyButtonPressed(_arduboy))
+                    Reset();
         }
+    }
+
+    static bool AnyButtonPressed(Arduboy2 arduboy)
+    {
+        return (arduboy.justPressed(UP_BUTTON) ||
+                arduboy.justPressed(DOWN_BUTTON) ||
+                arduboy.justPressed(LEFT_BUTTON) ||
+                arduboy.justPressed(RIGHT_BUTTON) ||
+                arduboy.justPressed(A_BUTTON) ||
+                arduboy.justPressed(B_BUTTON));
     }
 };

@@ -1,17 +1,21 @@
 #pragma once
 
-struct Vector {
+struct Vector
+{
     float x, y;
-    
-    float DotProduct(const Vector& other) const {
+
+    float DotProduct(const Vector &other) const
+    {
         return x * other.x + y * other.y;
     }
 
-    float Length() const {
+    float Length() const
+    {
         return sqrt(x * x + y * y);
     }
 
-    Vector Normalize() const {
+    Vector Normalize() const
+    {
         float len = Length();
         return {x / len, y / len};
     }

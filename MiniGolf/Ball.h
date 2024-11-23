@@ -1,20 +1,19 @@
 #pragma once
 
 #include "Vector.h"
-#include <Arduboy2.h>
 
 struct Ball
 {
-    float x, y;
-    Vector velocity;    // used for when the ball is in motion
-    float direction;    // used for choosing which direction to hit the ball
-    float power = (MaxPower + MinPower) / 2;    // how hard to hit the ball
+    float x = 0, y = 0;
+    Vector velocity = {0, 0};                // used for when the ball is in motion
+    float direction = 0;                     // used for choosing which direction to hit the ball
+    float power = (MaxPower + MinPower) / 2; // how hard to hit the ball
 
     static constexpr uint8_t Radius = 2;
     static constexpr float Friction = .60;           // percentage to reduce velocity by every second
     static constexpr float MinVelocityThreshold = 3; // stop the ball when velocity is below this threshold
     static constexpr uint8_t MaxPower = 150;
-    static constexpr uint8_t MinPower = 25;
+    static constexpr uint8_t MinPower = 20;
     static constexpr uint8_t PowerChangePerSecond = 50;
 
     Ball() = default;
