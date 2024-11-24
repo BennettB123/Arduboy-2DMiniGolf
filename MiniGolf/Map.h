@@ -19,7 +19,7 @@ typedef struct Wall
 
 typedef struct Map
 {
-    char* name;
+    char *name;
     uint8_t par;
     int16_t width;
     int16_t height;
@@ -32,34 +32,50 @@ typedef struct Map
 
 Map GetMap1()
 {
-    int16_t width = 175;
-    int16_t height = 125;
+    // square map
+    int16_t width = Arduboy2::width() - 1;
+    int16_t height = width;
+
+    int16_t wall1_x = 42;
+    int16_t wall2_x = 84;
+    int16_t cornerSize = 20;
 
     return {
-        .name = "Map 1",
-        .par = 3,
+        .name = "Squiggly Lane",
+        .par = 5,
         .width = width,
         .height = height,
-        .start = Point(10, 10),
+        .start = Point(5, 5),
         .end = Point(width - 10, height - 10),
         .walls =
             {
-                // Border
-                // TODO: remove border walls and have it just be implicit
-                Wall(0, 0, width, 0),           // top border
-                Wall(width, 0, width, height),  // right border
-                Wall(0, height, width, height), // bottom border
-                Wall(0, 0, 0, height),          // left border
+                // top borders
+                Wall(0, 0, wall1_x - cornerSize, 0),
+                Wall(wall1_x + cornerSize, 0, width - cornerSize, 0),
 
-                // Triangle 1
-                Wall(32, 32, 60, 60),
-                Wall(32, 32, 60, 32),
-                Wall(60, 32, 60, 60),
+                // right border
+                Wall(width, cornerSize, width, height),
 
-                // Polygon 1
-                Wall(85, 75, 110, 75),
-                Wall(110, 75, 100, 100),
-                Wall(100, 100, 75, 100),
-                Wall(75, 100, 85, 75),
+                // bottom borders
+                Wall(cornerSize, height, wall2_x - cornerSize, height),
+                Wall(wall2_x + cornerSize, height, width, height),
+
+                // left border
+                Wall(0, 0, 0, height - cornerSize),
+
+                // large walls
+                Wall(wall1_x, cornerSize, wall1_x, 94),
+                Wall(wall2_x, 32, wall2_x, height - cornerSize),
+
+                // corners
+                Wall(wall1_x - cornerSize, 0, wall1_x, cornerSize),
+                Wall(0, height - cornerSize, cornerSize, height),
+                Wall(wall1_x, cornerSize, wall1_x + cornerSize, 0),
+                Wall(wall2_x - cornerSize, height, wall2_x, height - cornerSize),
+                Wall(width - cornerSize, 0, width, cornerSize),
+                Wall(wall2_x, height - cornerSize, wall2_x + cornerSize, height),
+
+                // extra wall for an obstacle
+                Wall(width / 2, height / 2, width / 6 * 5, height / 2),
             }};
 };
