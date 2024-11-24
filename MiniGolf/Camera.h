@@ -63,20 +63,20 @@ public:
 
     void DrawBall(const Ball &ball)
     {
-        _arduboy.fillCircle(static_cast<int16_t>(ball.x) - _cameraX,
-                            static_cast<int16_t>(ball.y) - _cameraY,
+        _arduboy.fillCircle(static_cast<int16_t>(ball.X) - _cameraX,
+                            static_cast<int16_t>(ball.Y) - _cameraY,
                             Ball::Radius);
     }
 
     void DrawAimHud(const Ball &ball)
     {
-        float lineLength = map(ball.power, Ball::MinPower, Ball::MaxPower, MinPowerLineLength, MaxPowerLineLength);
+        float lineLength = map(ball.Power, Ball::MinPower, Ball::MaxPower, MinPowerLineLength, MaxPowerLineLength);
 
-        float x = ball.x + cos(ball.direction) * lineLength;
-        float y = ball.y + -(sin(ball.direction) * lineLength);
+        float x = ball.X + cos(ball.Direction) * lineLength;
+        float y = ball.Y + -(sin(ball.Direction) * lineLength);
 
-        _arduboy.drawLine(ball.x - _cameraX,
-                          ball.y - _cameraY,
+        _arduboy.drawLine(ball.X - _cameraX,
+                          ball.Y - _cameraY,
                           x - _cameraX,
                           y - _cameraY);
     }

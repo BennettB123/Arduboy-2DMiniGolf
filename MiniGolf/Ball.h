@@ -2,41 +2,41 @@
 
 #include "Vector.h"
 
-struct Ball
+class Ball
 {
 private:
     bool _powerIncreasing = true;
+    static constexpr float _friction = .60;           // percentage to reduce velocity by every second
+    static constexpr float _minVelocityThreshold = 3; // stop the ball when velocity is below this threshold
+    static constexpr uint8_t _powerChangePerSecond = 100;
 
 public:
-    float x = 0, y = 0;
-    Vector velocity = {0, 0};   // used for when the ball is in motion
-    float direction = 0;        // used for choosing which direction to hit the ball
-    float power = DefaultPower; // how hard to hit the ball
+    float X = 0, Y = 0;
+    Vector Velocity = {0, 0};   // used for when the ball is in motion
+    float Direction = 0;        // used for choosing which direction to hit the ball
+    float Power = DefaultPower; // how hard to hit the ball
 
     static constexpr uint8_t Radius = 2;
-    static constexpr float Friction = .60;           // percentage to reduce velocity by every second
-    static constexpr float MinVelocityThreshold = 3; // stop the ball when velocity is below this threshold
-    static constexpr uint8_t MaxPower = 150;
     static constexpr uint8_t MinPower = 20;
+    static constexpr uint8_t MaxPower = 150;
     static constexpr uint8_t DefaultPower = (MaxPower + MinPower) / 2;
-    static constexpr uint8_t PowerChangePerSecond = 100;
 
     Ball() = default;
-    Ball(float x, float y) : x(x), y(y) {}
+    Ball(float x, float y) : X(x), Y(y) {}
 
     // TODO: take into account secondsDelta
     void RotateDirection(float delta)
     {
-        direction += delta;
-        if (direction < 0)
-            direction = TWO_PI + direction;
-        else if (direction > TWO_PI)
-            direction = direction - TWO_PI;
+        Direction += delta;
+        if (Direction < 0)
+            Direction = TWO_PI + Direction;
+        else if (Direction > TWO_PI)
+            Direction = Direction - TWO_PI;
     }
 
     void ResetPower()
     {
-        power = DefaultPower;
+        Power = DefaultPower;
         _powerIncreasing = true;
     }
 
@@ -44,19 +44,19 @@ public:
     {
         if (_powerIncreasing)
         {
-            power += PowerChangePerSecond * secondsDelta;
-            if (power > MaxPower)
+            Power += _powerChangePerSecond * secondsDelta;
+            if (Power > MaxPower)
             {
-                power = MaxPower;
+                Power = MaxPower;
                 _powerIncreasing = false;
             }
         }
         else
         {
-            power -= PowerChangePerSecond * secondsDelta;
-            if (power < MinPower)
+            Power -= _powerChangePerSecond * secondsDelta;
+            if (Power < MinPower)
             {
-                power = MinPower;
+                Power = MinPower;
                 _powerIncreasing = true;
             }
         }
@@ -64,24 +64,24 @@ public:
 
     void StartHit()
     {
-        velocity.x = cos(direction) * power;
-        velocity.y = -sin(direction) * power;
+        Velocity.x = cos(Direction) * Power;
+        Velocity.y = -sin(Direction) * Power;
     }
 
     void Move(float secondsDelta)
     {
-        x += velocity.x * secondsDelta;
-        y += velocity.y * secondsDelta;
+        X += Velocity.x * secondsDelta;
+        Y += Velocity.y * secondsDelta;
 
-        velocity.x -= velocity.x * Friction * secondsDelta;
-        velocity.y -= velocity.y * Friction * secondsDelta;
+        Velocity.x -= Velocity.x * _friction * secondsDelta;
+        Velocity.y -= Velocity.y * _friction * secondsDelta;
 
-        if (velocity.Length() < MinVelocityThreshold)
-            velocity = {0, 0};
+        if (Velocity.Length() < _minVelocityThreshold)
+            Velocity = {0, 0};
     }
 
     bool IsStopped()
     {
-        return velocity.x == 0 && velocity.y == 0;
+        return Velocity.x == 0 && Velocity.y == 0;
     }
 };

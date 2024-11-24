@@ -20,7 +20,7 @@ public:
 
     static bool BallInHole(Ball &ball, const Map &map)
     {
-        float dist = Distance(ball.x, ball.y, map.end.x, map.end.y);
+        float dist = Distance(ball.X, ball.Y, map.end.x, map.end.y);
         return dist <= Map::HoleRadius;
     }
 
@@ -37,8 +37,8 @@ private:
         float dy = static_cast<float>(wall.p2.y - wall.p1.y);
 
         // Vector from p1 to the ball's center
-        float fx = ball.x - static_cast<float>(wall.p1.x);
-        float fy = ball.y - static_cast<float>(wall.p1.y);
+        float fx = ball.X - static_cast<float>(wall.p1.x);
+        float fy = ball.Y - static_cast<float>(wall.p1.y);
 
         // Project the ball's center onto the line defined by p1 and p2
         float lenSquared = dx * dx + dy * dy;
@@ -52,7 +52,7 @@ private:
         float closestY = wall.p1.y + t * dy;
 
         // Calculate the distance from the ball's center to the closest point
-        float distanceToWall = Distance(ball.x, ball.y, closestX, closestY);
+        float distanceToWall = Distance(ball.X, ball.Y, closestX, closestY);
 
         // Check if the distance is less than or equal to the radius
         return distanceToWall <= Ball::Radius;
@@ -69,8 +69,8 @@ private:
         wallNormal = wallNormal.Normalize();
 
         // Reflect the ball's velocity
-        float dotProduct = ball.velocity.DotProduct(wallNormal);
-        ball.velocity.x -= 2 * dotProduct * wallNormal.x;
-        ball.velocity.y -= 2 * dotProduct * wallNormal.y;
+        float dotProduct = ball.Velocity.DotProduct(wallNormal);
+        ball.Velocity.x -= 2 * dotProduct * wallNormal.x;
+        ball.Velocity.y -= 2 * dotProduct * wallNormal.y;
     }
 };

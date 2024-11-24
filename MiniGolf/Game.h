@@ -72,15 +72,15 @@ public:
 
             if (CollisionHandler::BallInHole(_ball, _map))
             {
-                _ball.x = _map.end.x;
-                _ball.y = _map.end.y;
-                _ball.velocity = {0, 0};
+                _ball.X = _map.end.x;
+                _ball.Y = _map.end.y;
+                _ball.Velocity = {0, 0};
                 _gameState = GameState::MapComplete;
             }
         }
 
         if (_gameState != GameState::MapExplorer)
-            _camera.FocusOn(_ball.x, _ball.y);
+            _camera.FocusOn(_ball.X, _ball.Y);
     }
 
     void Display()
@@ -190,7 +190,7 @@ private:
         if (_arduboy.justPressed(B_BUTTON))
         {
             _gameState = GameState::Aiming;
-            _camera.FocusOn(_ball.x, _ball.y);
+            _camera.FocusOn(_ball.X, _ball.Y);
         }
     }
 
