@@ -13,7 +13,7 @@ enum class GameState
     ChoosingPower,
     MapExplorer,
     BallInMotion,
-    HoleComplete
+    MapComplete
 };
 
 class Game
@@ -49,8 +49,6 @@ public:
 
     void Tick(float secondsDelta)
     {
-        Serial.println(_ball.power);
-
         _secondsDelta = secondsDelta;
 
         HandleInput();
@@ -77,7 +75,7 @@ public:
                 _ball.x = _map.end.x;
                 _ball.y = _map.end.y;
                 _ball.velocity = {0, 0};
-                _gameState = GameState::HoleComplete;
+                _gameState = GameState::MapComplete;
             }
         }
 
@@ -87,23 +85,39 @@ public:
 
     void Display()
     {
-        _camera.DrawMap(_map);
-        _camera.DrawBall(_ball);
-
-        if (_gameState == GameState::Aiming ||
-            _gameState == GameState::ChoosingPower ||
-            _gameState == GameState::MapExplorer)
-            _camera.DrawAimHud(_ball);
-
-        if (_gameState == GameState::MapSummary)
-            _camera.DrawMapSummary(_map);
-
-
-        if (_gameState == GameState::MapExplorer)
-            _camera.DrawMapExplorerIndicator();
-
-        if (_gameState == GameState::HoleComplete)
-            _camera.DrawMapComplete(_map, _strokes);
+        switch (_gameState)
+        {
+            case GameState::MapSummary:
+                _camera.DrawMap(_map);
+                _camera.DrawBall(_ball);
+                _camera.DrawMapSummary(_map);
+                break;
+            case GameState::Aiming:
+                _camera.DrawMap(_map);
+                _camera.DrawBall(_ball);
+                _camera.DrawAimHud(_ball);
+                break;
+            case GameState::ChoosingPower:
+                _camera.DrawMap(_map);
+                _camera.DrawBall(_ball);
+                _camera.DrawAimHud(_ball);
+                break;
+            case GameState::MapExplorer:
+                _camera.DrawMap(_map);
+                _camera.DrawBall(_ball);
+                _camera.DrawAimHud(_ball);
+                _camera.DrawMapExplorerIndicator();
+                break;
+            case GameState::BallInMotion:
+                _camera.DrawMap(_map);
+                _camera.DrawBall(_ball);
+                break;
+            case GameState::MapComplete:
+                _camera.DrawMap(_map);
+                _camera.DrawBall(_ball);
+                _camera.DrawMapComplete(_map, _strokes);
+                break;
+        }
     }
 
 private:
@@ -123,8 +137,8 @@ private:
             case GameState::MapExplorer:
                 HandleInputMapExplorer();
                 break;
-            case GameState::HoleComplete:
-                HandleInputHoleComplete();
+            case GameState::MapComplete:
+                HandleInputMapComplete();
                 break;
         }
     }
@@ -180,7 +194,7 @@ private:
         }
     }
 
-    void HandleInputHoleComplete()
+    void HandleInputMapComplete()
     {
         if (AnyButtonPressed(_arduboy))
             Reset();
