@@ -24,6 +24,7 @@ private:
     Ball _ball;
     GameState _gameState;
     uint8_t _strokes;
+    float _secondsDelta;
 
 public:
     Game(Arduboy2 arduboy) : _arduboy(arduboy)
@@ -32,6 +33,7 @@ public:
         _camera = Camera(_arduboy, 0, 0, _map.width, _map.height);
         _ball = Ball(static_cast<float>(_map.start.x), static_cast<float>(_map.start.y));
         _gameState = GameState::MapSummary;
+        _secondsDelta = 0;
     }
 
     void Reset()
@@ -41,11 +43,14 @@ public:
         _ball = Ball(static_cast<float>(_map.start.x), static_cast<float>(_map.start.y));
         _gameState = GameState::Aiming;
         _strokes = 0;
+        _secondsDelta = 0;
     }
 
     void Tick(float secondsDelta)
     {
-        HandleInput(secondsDelta);
+        _secondsDelta = secondsDelta;
+
+        HandleInput();
 
         if (_gameState == GameState::BallInMotion)
         {
@@ -88,52 +93,74 @@ public:
     }
 
 private:
-    void HandleInput(float secondsDelta)
+    void HandleInput()
     {
         switch (_gameState)
         {
             case GameState::MapSummary:
-                if (AnyButtonPressed(_arduboy))
-                    _gameState = GameState::Aiming;
+                HandleInputMapSummary();
+                break;
             case GameState::Aiming:
-                if (_arduboy.justPressed(B_BUTTON))
-                    _gameState = GameState::MapExplorer;
-                if (_arduboy.justPressed(A_BUTTON))
-                {
-                    _gameState = GameState::BallInMotion;
-                    _ball.StartHit();
-                    _strokes++;
-                }
-                if (_arduboy.pressed(LEFT_BUTTON))
-                    _ball.RotateDirection(0.02);
-                if (_arduboy.pressed(RIGHT_BUTTON))
-                    _ball.RotateDirection(-0.02);
-                if (_arduboy.pressed(UP_BUTTON))
-                    _ball.IncreasePower(secondsDelta);
-                if (_arduboy.pressed(DOWN_BUTTON))
-                    _ball.DecreasePower(secondsDelta);
+                HandleInputAiming();
                 break;
 
             case GameState::MapExplorer:
-                if (_arduboy.justPressed(B_BUTTON))
-                {
-                    _gameState = GameState::Aiming;
-                    _camera.FocusOn(_ball.x, _ball.y);
-                }
-                if (_arduboy.pressed(UP_BUTTON))
-                    _camera.MoveUp();
-                if (_arduboy.pressed(DOWN_BUTTON))
-                    _camera.MoveDown();
-                if (_arduboy.pressed(LEFT_BUTTON))
-                    _camera.MoveLeft();
-                if (_arduboy.pressed(RIGHT_BUTTON))
-                    _camera.MoveRight();
+                HandleInputMapExplorer();
                 break;
 
             case GameState::HoleComplete:
-                if (AnyButtonPressed(_arduboy))
-                    Reset();
+                HandleInputHoleComplete();
+                break;
         }
+    }
+
+    void HandleInputMapSummary()
+    {
+        if (AnyButtonPressed(_arduboy))
+            _gameState = GameState::Aiming;
+    }
+
+    void HandleInputAiming()
+    {
+        if (_arduboy.justPressed(B_BUTTON))
+            _gameState = GameState::MapExplorer;
+        if (_arduboy.justPressed(A_BUTTON))
+        {
+            _gameState = GameState::BallInMotion;
+            _ball.StartHit();
+            _strokes++;
+        }
+        if (_arduboy.pressed(LEFT_BUTTON))
+            _ball.RotateDirection(0.02);
+        if (_arduboy.pressed(RIGHT_BUTTON))
+            _ball.RotateDirection(-0.02);
+        if (_arduboy.pressed(UP_BUTTON))
+            _ball.IncreasePower(_secondsDelta);
+        if (_arduboy.pressed(DOWN_BUTTON))
+            _ball.DecreasePower(_secondsDelta);
+    }
+
+    void HandleInputMapExplorer()
+    {
+        if (_arduboy.justPressed(B_BUTTON))
+        {
+            _gameState = GameState::Aiming;
+            _camera.FocusOn(_ball.x, _ball.y);
+        }
+        if (_arduboy.pressed(UP_BUTTON))
+            _camera.MoveUp();
+        if (_arduboy.pressed(DOWN_BUTTON))
+            _camera.MoveDown();
+        if (_arduboy.pressed(LEFT_BUTTON))
+            _camera.MoveLeft();
+        if (_arduboy.pressed(RIGHT_BUTTON))
+            _camera.MoveRight();
+    }
+
+    void HandleInputHoleComplete()
+    {
+        if (AnyButtonPressed(_arduboy))
+            Reset();
     }
 
     static bool AnyButtonPressed(Arduboy2 arduboy)
