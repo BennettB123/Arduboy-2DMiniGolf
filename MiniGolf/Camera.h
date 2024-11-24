@@ -106,11 +106,11 @@ public:
         PrintlnCentered(F("Hole"));
         PrintlnCentered(F("Complete!"));
 
-        MoveCursorDown(5);
+        MoveTextCursorDown(5);
         PrintlnCentered("par " + String(map.par));
         PrintlnCentered("strokes: " + String(strokes));
 
-        MoveCursorDown(5);
+        MoveTextCursorDown(5);
         PrintlnCentered(F("Press any button"));
         PrintlnCentered(F("to restart"));
     }
@@ -151,6 +151,11 @@ private:
     {
         _cameraX = constrain(_cameraX, 0, _mapWidth - Arduboy2::width() + 1);
         _cameraY = constrain(_cameraY, 0, _mapHeight - Arduboy2::height() + 1);
+
+        if (_mapWidth < Arduboy2::width())
+            _cameraX = 0;
+        if (_mapHeight < Arduboy2::height())
+            _cameraY = 0;
     }
 
     void PrintlnCentered(const String &text)
@@ -162,7 +167,7 @@ private:
         _arduboy.println(text);
     }
 
-    void MoveCursorDown(uint8_t offset)
+    void MoveTextCursorDown(uint8_t offset)
     {
         _arduboy.setCursorY(_arduboy.getCursorY() + offset);
     }
