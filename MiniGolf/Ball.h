@@ -9,6 +9,7 @@ private:
     static constexpr float _friction = .60;           // percentage to reduce velocity by every second
     static constexpr float _minVelocityThreshold = 3; // stop the ball when velocity is below this threshold
     static constexpr uint8_t _powerChangePerSecond = 100;
+    static constexpr float _aimChangePerSecond = 1.75;
 
 public:
     float X = 0, Y = 0;
@@ -24,13 +25,15 @@ public:
     Ball() = default;
     Ball(float x, float y) : X(x), Y(y) {}
 
-    // TODO: take into account secondsDelta
-    void RotateDirection(float delta)
-    {
-        Direction += delta;
+    void RotateDirectionClockwise(float secondsDelta) {
+        Direction -= _aimChangePerSecond * secondsDelta;
         if (Direction < 0)
             Direction = TWO_PI + Direction;
-        else if (Direction > TWO_PI)
+    }
+
+    void RotateDirectionCounterClockwise(float secondsDelta) {
+        Direction += _aimChangePerSecond * secondsDelta;
+        if (Direction > TWO_PI)
             Direction = Direction - TWO_PI;
     }
 

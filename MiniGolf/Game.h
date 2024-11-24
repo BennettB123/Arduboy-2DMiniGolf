@@ -156,9 +156,9 @@ private:
         if (_arduboy.justPressed(A_BUTTON))
             _gameState = GameState::ChoosingPower;
         if (_arduboy.pressed(LEFT_BUTTON))
-            _ball.RotateDirection(0.02);
+            _ball.RotateDirectionCounterClockwise(_secondsDelta);
         if (_arduboy.pressed(RIGHT_BUTTON))
-            _ball.RotateDirection(-0.02);
+            _ball.RotateDirectionClockwise(_secondsDelta);
     }
 
     void HandleInputChoosingPower()
