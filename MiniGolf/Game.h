@@ -10,6 +10,7 @@ enum class GameState
 {
     MapSummary,
     Aiming,
+    ChoosingPower,
     MapExplorer,
     BallInMotion,
     HoleComplete
@@ -48,16 +49,26 @@ public:
 
     void Tick(float secondsDelta)
     {
+        Serial.println(_ball.power);
+
         _secondsDelta = secondsDelta;
 
         HandleInput();
+
+        if (_gameState == GameState::ChoosingPower)
+        {
+            _ball.TickPower(secondsDelta);
+        }
 
         if (_gameState == GameState::BallInMotion)
         {
             _ball.Move(secondsDelta);
 
-            if (_ball.Stopped())
+            if (_ball.IsStopped())
+            {
                 _gameState = GameState::Aiming;
+                _ball.ResetPower();
+            }
 
             CollisionHandler::HandleCollisions(_ball, _map);
 
@@ -79,11 +90,14 @@ public:
         _camera.DrawMap(_map);
         _camera.DrawBall(_ball);
 
+        if (_gameState == GameState::Aiming ||
+            _gameState == GameState::ChoosingPower ||
+            _gameState == GameState::MapExplorer)
+            _camera.DrawAimHud(_ball);
+
         if (_gameState == GameState::MapSummary)
             _camera.DrawMapSummary(_map);
 
-        if (_gameState == GameState::Aiming || _gameState == GameState::MapExplorer)
-            _camera.DrawAimHud(_ball);
 
         if (_gameState == GameState::MapExplorer)
             _camera.DrawMapExplorerIndicator();
@@ -103,11 +117,12 @@ private:
             case GameState::Aiming:
                 HandleInputAiming();
                 break;
-
+            case GameState::ChoosingPower:
+                HandleInputChoosingPower();
+                break;
             case GameState::MapExplorer:
                 HandleInputMapExplorer();
                 break;
-
             case GameState::HoleComplete:
                 HandleInputHoleComplete();
                 break;
@@ -125,28 +140,31 @@ private:
         if (_arduboy.justPressed(B_BUTTON))
             _gameState = GameState::MapExplorer;
         if (_arduboy.justPressed(A_BUTTON))
-        {
-            _gameState = GameState::BallInMotion;
-            _ball.StartHit();
-            _strokes++;
-        }
+            _gameState = GameState::ChoosingPower;
         if (_arduboy.pressed(LEFT_BUTTON))
             _ball.RotateDirection(0.02);
         if (_arduboy.pressed(RIGHT_BUTTON))
             _ball.RotateDirection(-0.02);
-        if (_arduboy.pressed(UP_BUTTON))
-            _ball.IncreasePower(_secondsDelta);
-        if (_arduboy.pressed(DOWN_BUTTON))
-            _ball.DecreasePower(_secondsDelta);
     }
 
-    void HandleInputMapExplorer()
+    void HandleInputChoosingPower()
     {
         if (_arduboy.justPressed(B_BUTTON))
         {
             _gameState = GameState::Aiming;
-            _camera.FocusOn(_ball.x, _ball.y);
+            return;
         }
+        if (_arduboy.justPressed(A_BUTTON))
+        {
+            _gameState = GameState::BallInMotion;
+            _ball.StartHit();
+            _strokes++;
+            return;
+        }
+    }
+
+    void HandleInputMapExplorer()
+    {
         if (_arduboy.pressed(UP_BUTTON))
             _camera.MoveUp();
         if (_arduboy.pressed(DOWN_BUTTON))
@@ -155,6 +173,11 @@ private:
             _camera.MoveLeft();
         if (_arduboy.pressed(RIGHT_BUTTON))
             _camera.MoveRight();
+        if (_arduboy.justPressed(B_BUTTON))
+        {
+            _gameState = GameState::Aiming;
+            _camera.FocusOn(_ball.x, _ball.y);
+        }
     }
 
     void HandleInputHoleComplete()
@@ -163,6 +186,7 @@ private:
             Reset();
     }
 
+private:
     static bool AnyButtonPressed(Arduboy2 arduboy)
     {
         return (arduboy.justPressed(UP_BUTTON) ||

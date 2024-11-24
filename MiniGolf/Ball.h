@@ -4,17 +4,22 @@
 
 struct Ball
 {
+private:
+    bool _powerIncreasing = true;
+
+public:
     float x = 0, y = 0;
-    Vector velocity = {0, 0};                // used for when the ball is in motion
-    float direction = 0;                     // used for choosing which direction to hit the ball
-    float power = (MaxPower + MinPower) / 2; // how hard to hit the ball
+    Vector velocity = {0, 0};   // used for when the ball is in motion
+    float direction = 0;        // used for choosing which direction to hit the ball
+    float power = DefaultPower; // how hard to hit the ball
 
     static constexpr uint8_t Radius = 2;
     static constexpr float Friction = .60;           // percentage to reduce velocity by every second
     static constexpr float MinVelocityThreshold = 3; // stop the ball when velocity is below this threshold
     static constexpr uint8_t MaxPower = 150;
     static constexpr uint8_t MinPower = 20;
-    static constexpr uint8_t PowerChangePerSecond = 50;
+    static constexpr uint8_t DefaultPower = (MaxPower + MinPower) / 2;
+    static constexpr uint8_t PowerChangePerSecond = 100;
 
     Ball() = default;
     Ball(float x, float y) : x(x), y(y) {}
@@ -29,16 +34,32 @@ struct Ball
             direction = direction - TWO_PI;
     }
 
-    void IncreasePower(float secondsDelta)
+    void ResetPower()
     {
-        power += PowerChangePerSecond * secondsDelta;
-        power = constrain(power, MinPower, MaxPower);
+        power = DefaultPower;
+        _powerIncreasing = true;
     }
 
-    void DecreasePower(float secondsDelta)
+    void TickPower(float secondsDelta)
     {
-        power -= PowerChangePerSecond * secondsDelta;
-        power = constrain(power, MinPower, MaxPower);
+        if (_powerIncreasing)
+        {
+            power += PowerChangePerSecond * secondsDelta;
+            if (power > MaxPower)
+            {
+                power = MaxPower;
+                _powerIncreasing = false;
+            }
+        }
+        else
+        {
+            power -= PowerChangePerSecond * secondsDelta;
+            if (power < MinPower)
+            {
+                power = MinPower;
+                _powerIncreasing = true;
+            }
+        }
     }
 
     void StartHit()
@@ -59,7 +80,7 @@ struct Ball
             velocity = {0, 0};
     }
 
-    bool Stopped()
+    bool IsStopped()
     {
         return velocity.x == 0 && velocity.y == 0;
     }
