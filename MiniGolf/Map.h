@@ -4,16 +4,25 @@
 
 constexpr uint8_t MaxNumWalls = 20;
 
+typedef struct Point8
+{
+    uint8_t x;
+    uint8_t y;
+
+    Point8() = default;
+    Point8 (uint8_t x, uint8_t y): x(x), y(y) { }
+};
+
 typedef struct Wall
 {
-    Point p1;
-    Point p2;
+    Point8 p1;
+    Point8 p2;
 
     Wall() = default;
-    Wall(int16_t x1, int16_t y1, int16_t x2, int16_t y2)
+    Wall(int8_t x1, int8_t y1, int8_t x2, int8_t y2)
     {
-        p1 = Point(x1, y1);
-        p2 = Point(x2, y2);
+        p1 = Point8(x1, y1);
+        p2 = Point8(x2, y2);
     }
 };
 
@@ -21,10 +30,10 @@ typedef struct Map
 {
     char *name;
     uint8_t par;
-    int16_t width;
-    int16_t height;
-    Point start;
-    Point end;
+    int8_t width;
+    int8_t height;
+    Point8 start;
+    Point8 end;
     Wall walls[MaxNumWalls];
 
     static constexpr uint8_t HoleRadius = 3;
@@ -33,20 +42,20 @@ typedef struct Map
 Map GetMap1()
 {
     // square map
-    int16_t width = Arduboy2::width() - 1;
-    int16_t height = width;
+    int8_t width = Arduboy2::width() - 1;
+    int8_t height = width;
 
-    int16_t wall1_x = 42;
-    int16_t wall2_x = 84;
-    int16_t cornerSize = 20;
+    int8_t wall1_x = 42;
+    int8_t wall2_x = 84;
+    int8_t cornerSize = 20;
 
     return {
         .name = "Squiggly Lane",
         .par = 5,
         .width = width,
         .height = height,
-        .start = Point(5, 5),
-        .end = Point(width - 10, height - 10),
+        .start = Point8(5, 5),
+        .end = Point8(width - 10, height - 10),
         .walls =
             {
                 // top borders

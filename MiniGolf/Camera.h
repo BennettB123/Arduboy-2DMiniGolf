@@ -41,8 +41,8 @@ public:
         // draw walls
         for (uint8_t i = 0; i < MaxNumWalls; i++)
         {
-            Point p1 = map.walls[i].p1;
-            Point p2 = map.walls[i].p2;
+            Point8 p1 = map.walls[i].p1;
+            Point8 p2 = map.walls[i].p2;
             _arduboy.drawLine(p1.x - _cameraX,
                               p1.y - _cameraY,
                               p2.x - _cameraX,
@@ -140,7 +140,7 @@ public:
     }
 
 private:
-    void DrawHole(const Point &hole)
+    void DrawHole(const Point8 &hole)
     {
         _arduboy.drawCircle(hole.x - _cameraX,
                             hole.y - _cameraY,
