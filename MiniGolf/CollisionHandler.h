@@ -13,8 +13,13 @@ public:
     {
         for (auto wall : map.walls)
         {
+            // main wall
             if (IsColliding(ball, wall))
                 HandleCollision(ball, wall);
+
+            // ends of walls
+            if (IsCollidingEdges(ball, wall))
+                HandleCollisionEdges(ball, wall);
         }
     }
 
@@ -28,6 +33,16 @@ private:
     static float Distance(float x1, float y1, float x2, float y2)
     {
         return sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+    }
+
+    static bool IsCollidingEdges(const Ball &ball, const Wall &wall)
+    {
+        float edgeDistance1 = Distance(ball.X, ball.Y, wall.p1.x, wall.p1.y);
+        float edgeDistance2 = Distance(ball.X, ball.Y, wall.p2.x, wall.p2.y);
+
+        float ballRadius = Ball::Radius + .5; // increase radius slightly to give better visual effect
+
+        return (edgeDistance1 <= ballRadius || edgeDistance2 <= ballRadius);
     }
 
     static bool IsColliding(const Ball &ball, const Wall &wall)
@@ -55,7 +70,8 @@ private:
         float distanceToWall = Distance(ball.X, ball.Y, closestX, closestY);
 
         // Check if the distance is less than or equal to the radius
-        return distanceToWall <= Ball::Radius;
+        float ballRadius = Ball::Radius + .5; // increase radius slightly to give better visual effect
+        return distanceToWall <= ballRadius;
     }
 
     // Change ball's velocity when it hits a wall
@@ -66,6 +82,20 @@ private:
 
         // Wall normal vector (perpendicular to wall direction)
         Vector wallNormal = {-wallDir.y, wallDir.x};
+        wallNormal = wallNormal.Normalize();
+
+        // Reflect the ball's velocity
+        float dotProduct = ball.Velocity.DotProduct(wallNormal);
+        ball.Velocity.x -= 2 * dotProduct * wallNormal.x;
+        ball.Velocity.y -= 2 * dotProduct * wallNormal.y;
+    }
+
+    // kinda works, but sometimes wonky
+    static void HandleCollisionEdges(Ball &ball, const Wall &wall)
+    {
+        Vector wallDir = {wall.p2.x - wall.p1.x, wall.p2.y - wall.p1.y};
+
+        Vector wallNormal = {wallDir.x, wallDir.y};
         wallNormal = wallNormal.Normalize();
 
         // Reflect the ball's velocity
