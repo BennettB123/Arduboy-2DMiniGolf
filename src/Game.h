@@ -30,19 +30,14 @@ private:
 public:
     Game(Arduboy2 arduboy) : _arduboy(arduboy)
     {
-        _map = GetMap1();
-        _camera = Camera(_arduboy, 0, 0, _map.width, _map.height);
-        _ball = Ball(static_cast<float>(_map.start.x), static_cast<float>(_map.start.y));
-        _gameState = GameState::MapSummary;
-        _secondsDelta = 0;
     }
 
-    void Reset()
+    void Init()
     {
         _map = GetMap1();
         _camera = Camera(_arduboy, 0, 0, _map.width, _map.height);
         _ball = Ball(static_cast<float>(_map.start.x), static_cast<float>(_map.start.y));
-        _gameState = GameState::Aiming;
+        _gameState = GameState::MapSummary;
         _strokes = 0;
         _secondsDelta = 0;
     }
@@ -197,7 +192,7 @@ private:
     void HandleInputMapComplete()
     {
         if (AnyButtonPressed(_arduboy))
-            Reset();
+            Init();
     }
 
 private:

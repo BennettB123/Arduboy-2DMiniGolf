@@ -1,4 +1,6 @@
-#include "Game.h"
+#include "src/FX/ArduboyFX.h"
+#include "src/FX/fxdata.h"
+#include "src/Game.h"
 #include <Arduboy2.h>
 
 Arduboy2 arduboy;
@@ -9,9 +11,12 @@ void setup()
 {
     arduboy.begin();
     arduboy.setFrameRate(60);
-    arduboy.initRandomSeed();
+
+    FX::begin(FX_DATA_PAGE);
 
     previousTime = millis();
+
+    game.Init();
 }
 
 void loop()
@@ -30,5 +35,5 @@ void loop()
     game.Tick(secondsDelta);
     game.Display();
 
-    arduboy.display();
+    FX::display();
 }

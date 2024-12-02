@@ -10,8 +10,8 @@ private:
     Arduboy2 _arduboy;
     int16_t _cameraX;
     int16_t _cameraY;
-    int16_t _mapWidth;
-    int16_t _mapHeight;
+    uint8_t _mapWidth;
+    uint8_t _mapHeight;
     bool _textFlashToggle = false;
 
     static constexpr uint8_t FontWidth = 5;
@@ -22,8 +22,8 @@ private:
 
 public:
     Camera() = default;
-    Camera(Arduboy2 arduboy, int16_t x, int16_t y, int16_t maxX, int16_t maxY)
-        : _arduboy(arduboy), _mapWidth(maxX), _mapHeight(maxY)
+    Camera(Arduboy2 arduboy, uint8_t x, uint8_t y, uint8_t mapWidth, uint8_t mapHeight)
+        : _arduboy(arduboy), _mapWidth(mapWidth), _mapHeight(mapHeight)
     {
         FocusOn(x, y);
     }

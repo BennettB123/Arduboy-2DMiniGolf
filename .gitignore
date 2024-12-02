@@ -1,2 +1,6 @@
 /build
 /.vscode
+
+# FX related files
+/MiniGolf/FX/fxdata.bin
+/MiniGolf/FX/fxdata-data.bin
