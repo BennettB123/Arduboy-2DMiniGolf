@@ -2,5 +2,5 @@
 /.vscode
 
 # FX related files
-/MiniGolf/FX/fxdata.bin
-/MiniGolf/FX/fxdata-data.bin
+src/FX/fxdata-data.bin
+src/FX/fxdata.bin
