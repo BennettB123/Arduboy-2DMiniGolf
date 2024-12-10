@@ -50,9 +50,10 @@ public:
         }
 
         // draw texture (dots on ground)
-        for (int i = 10; i < _mapWidth; i += 15)
+        uint8_t dotSpacing = 16;
+        for (int i = dotSpacing/2; i < _mapWidth; i += dotSpacing)
         {
-            for (int j = 10; j < _mapHeight; j += 15)
+            for (int j = dotSpacing/2; j < _mapHeight; j += dotSpacing)
             {
                 _arduboy.drawPixel(i - _cameraX, j - _cameraY);
             }

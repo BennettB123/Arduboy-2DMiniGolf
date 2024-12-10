@@ -1,11 +1,8 @@
 #pragma once
 
-#include "FX/ArduboyFX.h"
-#include "FX/fxdata.h"
 #include <Arduboy2.h>
 
 constexpr uint8_t MaxNumWalls = 20;
-constexpr uint8_t NumMaps = 1;
 
 struct Point8
 {
@@ -36,29 +33,8 @@ struct Map
     uint8_t height;
     Point8 start;
     Point8 end;
-    Wall walls[MaxNumWalls];
     const char *name;
+    Wall walls[MaxNumWalls];
 
     static constexpr uint8_t HoleRadius = 3;
 };
-
-const char* const mapNames[NumMaps] PROGMEM = {
-    "Squiggly Lane",
-};
-
-Map GetMap1()
-{
-    Map map;
-
-    // read map from FX data
-    FX::seekData(Maps);
-    for (uint8_t i = 0; i < NumMaps; i++)
-    {
-        FX::readObject(map);
-    }
-    FX::readEnd();
-
-    map.name = mapNames[0];
-
-    return map;
-}

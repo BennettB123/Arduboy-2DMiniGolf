@@ -4,6 +4,7 @@
 #include "Camera.h"
 #include "CollisionHandler.h"
 #include "Map.h"
+#include "MapManager.h"
 #include <Arduboy2.h>
 
 enum class GameState
@@ -20,6 +21,7 @@ class Game
 {
 private:
     Arduboy2 _arduboy;
+    uint8_t _mapIndex;
     Map _map;
     Camera _camera;
     Ball _ball;
@@ -34,7 +36,8 @@ public:
 
     void Init()
     {
-        _map = GetMap1();
+        _mapIndex = 0;
+        _map = MapManager::LoadMap(_mapIndex);
         _camera = Camera(_arduboy, 0, 0, _map.width, _map.height);
         _ball = Ball(static_cast<float>(_map.start.x), static_cast<float>(_map.start.y));
         _gameState = GameState::MapSummary;
@@ -192,10 +195,21 @@ private:
     void HandleInputMapComplete()
     {
         if (AnyButtonPressed(_arduboy))
-            Init();
+            LoadNextMap();
     }
 
-private:
+    void LoadNextMap()
+    {
+        _mapIndex += 1;
+        _map = MapManager::LoadMap(_mapIndex);
+
+        _camera = Camera(_arduboy, 0, 0, _map.width, _map.height);
+        _ball = Ball(static_cast<float>(_map.start.x), static_cast<float>(_map.start.y));
+        _gameState = GameState::MapSummary;
+        _strokes = 0;
+        _secondsDelta = 0;
+    }
+
     static bool AnyButtonPressed(Arduboy2 arduboy)
     {
         return (arduboy.justPressed(UP_BUTTON) ||
