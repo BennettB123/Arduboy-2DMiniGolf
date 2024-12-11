@@ -108,10 +108,45 @@ private:
         Vector wallNormal = {-wallDir.y, wallDir.x};
         wallNormal = wallNormal.Normalize();
 
+        // Determine which side of the wall the ball is on
+        Vector ballToWallStart = {ball.X - wall.p1.x, ball.Y - wall.p1.y};
+        float sideTest = ballToWallStart.DotProduct(wallNormal);
+
+        // If the ball is on the opposite side, reverse the normal
+        if (sideTest < 0)
+        {
+            wallNormal.x = -wallNormal.x;
+            wallNormal.y = -wallNormal.y;
+        }
+
         // Reflect the ball's velocity
         float dotProduct = ball.Velocity.DotProduct(wallNormal);
         ball.Velocity.x -= 2 * dotProduct * wallNormal.x;
         ball.Velocity.y -= 2 * dotProduct * wallNormal.y;
+
+        // Calculate the closest point on the wall segment to the ball's position
+        float projection = ballToWallStart.DotProduct(wallDir) / wallDir.DotProduct(wallDir);
+
+        // Clamp the projection to the segment [0, 1]
+        projection = max(0.0f, min(1.0f, projection));
+
+        // Find the closest point on the wall segment
+        Vector closestPoint = {wall.p1.x + projection * wallDir.x, wall.p1.y + projection * wallDir.y};
+
+        // Check if the ball is inside the wall and resolve penetration
+        Vector ballToClosestPoint = {ball.X - closestPoint.x, ball.Y - closestPoint.y};
+        float distanceToWall = ballToClosestPoint.Length();
+
+        // If the ball has penetrated the wall
+        if (distanceToWall < Ball::Radius)
+        {
+            // Calculate the penetration depth
+            float penetrationDepth = Ball::Radius - distanceToWall;
+
+            // Move the ball out of the wall along the wall normal
+            ball.X += penetrationDepth * wallNormal.x;
+            ball.Y += penetrationDepth * wallNormal.y;
+        }
     }
 
     static bool IsCollidingCircle(Ball &ball, const Circle &circle)
