@@ -160,13 +160,10 @@ private:
         int16_t maxX = _mapWidth - Arduboy2::width() + MaxBoundaryPadding;
         int16_t maxY = _mapHeight - Arduboy2::height() + MaxBoundaryPadding;
 
-        _cameraX = constrain(_cameraX, -MaxBoundaryPadding, maxX);
-        _cameraY = constrain(_cameraY, -MaxBoundaryPadding, maxY);
-
-        if (_mapWidth < Arduboy2::width())
-            _cameraX = -MaxBoundaryPadding;
-        if (_mapHeight < Arduboy2::height())
-            _cameraY = -MaxBoundaryPadding;
+        if (_cameraX > maxX) _cameraX = maxX;
+        if (_cameraY > maxY) _cameraY = maxY;
+        if (_cameraX < -MaxBoundaryPadding) _cameraX = -MaxBoundaryPadding;
+        if (_cameraY < -MaxBoundaryPadding) _cameraY = -MaxBoundaryPadding;
     }
 
     void PrintlnCentered(const String &text)
