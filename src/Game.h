@@ -66,7 +66,7 @@ public:
                 _ball.ResetPower();
             }
 
-            CollisionHandler::HandleCollisions(_ball, _map);
+            CollisionHandler::HandleAllCollisions(_ball, _map);
 
             if (CollisionHandler::BallInHole(_ball, _map))
             {

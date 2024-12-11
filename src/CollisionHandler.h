@@ -9,17 +9,53 @@ class CollisionHandler
     CollisionHandler() = delete; // enforce this to be a static class
 
 public:
-    static void HandleCollisions(Ball &ball, const Map &map)
+    static void HandleAllCollisions(Ball &ball, const Map &map)
     {
         for (auto wall : map.walls)
         {
-            if (IsColliding(ball, wall))
-                HandleCollision(ball, wall);
+            if (wall.p1.x == 0 &&
+                wall.p1.y == 0 &&
+                wall.p2.x == 0 &&
+                wall.p2.y == 0)
+                continue;
+
+            if (IsCollidingWall(ball, wall))
+            {
+                // handle Wall "end-caps" (should act like a tiny circle collision)
+                Vector wallDir1 = {wall.p2.x - wall.p1.x, wall.p2.y - wall.p1.y};
+                Vector wallDir2 = {wall.p1.x - wall.p2.x, wall.p1.y - wall.p2.y};
+                if (ball.Velocity.DotProduct(wallDir1) > 0)
+                {
+                    Circle c = Circle(wall.p1.x, wall.p1.y, 1);
+                    if (IsCollidingCircle(ball, c))
+                        HandleCollisionCircle(ball, c);
+                    else
+                        HandleCollisionWall(ball, wall);
+                }
+                else if (ball.Velocity.DotProduct(wallDir2) > 0)
+                {
+                    Circle c = Circle(wall.p2.x, wall.p2.y, 1);
+                    if (IsCollidingCircle(ball, c))
+                        HandleCollisionCircle(ball, c);
+                    else
+                        HandleCollisionWall(ball, wall);
+                }
+                else
+                {
+                    HandleCollisionWall(ball, wall);
+                }
+            }
         }
 
         for (auto circle : map.circles)
         {
-            HandleCollision(ball, circle);
+            if (circle.location.x == 0 &&
+                circle.location.y == 0 &&
+                circle.radius == 0)
+                continue;
+
+            if (IsCollidingCircle(ball, circle))
+                HandleCollisionCircle(ball, circle);
         }
     }
 
@@ -35,7 +71,7 @@ private:
         return sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
     }
 
-    static bool IsColliding(const Ball &ball, const Wall &wall)
+    static bool IsCollidingWall(const Ball &ball, const Wall &wall)
     {
         // Wall vector
         float dx = static_cast<float>(wall.p2.x - wall.p1.x);
@@ -63,7 +99,7 @@ private:
         return distanceToWall <= Ball::Radius;
     }
 
-    static void HandleCollision(Ball &ball, const Wall &wall)
+    static void HandleCollisionWall(Ball &ball, const Wall &wall)
     {
         // Wall direction vector
         Vector wallDir = {wall.p2.x - wall.p1.x, wall.p2.y - wall.p1.y};
@@ -78,21 +114,28 @@ private:
         ball.Velocity.y -= 2 * dotProduct * wallNormal.y;
     }
 
-    static void HandleCollision(Ball &ball, const Circle &circle) {
+    static bool IsCollidingCircle(Ball &ball, const Circle &circle)
+    {
         Vector circleToBall = {ball.X - circle.location.x, ball.Y - circle.location.y};
         float distance = circleToBall.Length();
 
-        if (distance <= circle.radius + Ball::Radius) {
-            // Resolve the collision by moving the ball outside of the circle 
-            Vector correction = circleToBall.Normalize();
-            ball.X += correction.x;
-            ball.Y += correction.y;
+        return distance <= circle.radius + Ball::Radius;
+    }
 
-            // Reflect the ball's velocity
-            Vector normal = circleToBall.Normalize();
-            float dotProduct = ball.Velocity.x * normal.x + ball.Velocity.y * normal.y;
-            ball.Velocity.x -= 2 * dotProduct * normal.x;
-            ball.Velocity.y -= 2 * dotProduct * normal.y;
-        }
+    static void HandleCollisionCircle(Ball &ball, const Circle &circle)
+    {
+        Vector circleToBall = {ball.X - circle.location.x, ball.Y - circle.location.y};
+        float distance = circleToBall.Length();
+
+        // Resolve the collision by moving the ball outside of the circle
+        Vector correction = circleToBall.Normalize();
+        ball.X += correction.x;
+        ball.Y += correction.y;
+
+        // Reflect the ball's velocity
+        Vector normal = circleToBall.Normalize();
+        float dotProduct = ball.Velocity.x * normal.x + ball.Velocity.y * normal.y;
+        ball.Velocity.x -= 2 * dotProduct * normal.x;
+        ball.Velocity.y -= 2 * dotProduct * normal.y;
     }
 };

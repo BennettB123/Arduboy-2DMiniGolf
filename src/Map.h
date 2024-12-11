@@ -30,10 +30,10 @@ struct Circle
     uint8_t radius;
 
     Circle() = default;
-    Circle(uint8_t x, uint8_t y, uint8_t radius)
+    Circle(uint8_t x, uint8_t y, uint8_t r)
     {
         location = Point8(x, y);
-        radius = radius;
+        radius = r;
     }
 };
 
