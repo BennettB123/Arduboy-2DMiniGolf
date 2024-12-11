@@ -16,6 +16,11 @@ public:
             if (IsColliding(ball, wall))
                 HandleCollision(ball, wall);
         }
+
+        for (auto circle : map.circles)
+        {
+            HandleCollision(ball, circle);
+        }
     }
 
     static bool BallInHole(Ball &ball, const Map &map)
@@ -58,7 +63,6 @@ private:
         return distanceToWall <= Ball::Radius;
     }
 
-    // Change ball's velocity when it hits a wall
     static void HandleCollision(Ball &ball, const Wall &wall)
     {
         // Wall direction vector
@@ -72,5 +76,23 @@ private:
         float dotProduct = ball.Velocity.DotProduct(wallNormal);
         ball.Velocity.x -= 2 * dotProduct * wallNormal.x;
         ball.Velocity.y -= 2 * dotProduct * wallNormal.y;
+    }
+
+    static void HandleCollision(Ball &ball, const Circle &circle) {
+        Vector circleToBall = {ball.X - circle.location.x, ball.Y - circle.location.y};
+        float distance = circleToBall.Length();
+
+        if (distance <= circle.radius + Ball::Radius) {
+            // Resolve the collision by moving the ball outside of the circle 
+            Vector correction = circleToBall.Normalize();
+            ball.X += correction.x;
+            ball.Y += correction.y;
+
+            // Reflect the ball's velocity
+            Vector normal = circleToBall.Normalize();
+            float dotProduct = ball.Velocity.x * normal.x + ball.Velocity.y * normal.y;
+            ball.Velocity.x -= 2 * dotProduct * normal.x;
+            ball.Velocity.y -= 2 * dotProduct * normal.y;
+        }
     }
 };

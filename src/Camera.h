@@ -19,6 +19,7 @@ private:
     static constexpr uint8_t HalfScreenHeight = Arduboy2::height() / 2;
     static constexpr uint8_t MaxPowerLineLength = 40;
     static constexpr uint8_t MinPowerLineLength = 10;
+    static constexpr uint8_t MaxBoundaryPadding = 5;
 
 public:
     Camera() = default;
@@ -39,14 +40,20 @@ public:
     void DrawMap(const Map &map)
     {
         // draw walls
-        for (uint8_t i = 0; i < MaxNumWalls; i++)
+        for (auto wall : map.walls)
         {
-            Point8 p1 = map.walls[i].p1;
-            Point8 p2 = map.walls[i].p2;
-            _arduboy.drawLine(p1.x - _cameraX,
-                              p1.y - _cameraY,
-                              p2.x - _cameraX,
-                              p2.y - _cameraY);
+            _arduboy.drawLine(wall.p1.x - _cameraX,
+                              wall.p1.y - _cameraY,
+                              wall.p2.x - _cameraX,
+                              wall.p2.y - _cameraY);
+        }
+
+        // draw circles
+        for (auto c : map.circles)
+        {
+            _arduboy.drawCircle(c.location.x - _cameraX,
+                                c.location.y - _cameraY,
+                                c.radius);
         }
 
         // draw texture (dots on ground)
@@ -150,13 +157,16 @@ private:
 
     void KeepInBounds()
     {
-        _cameraX = constrain(_cameraX, 0, _mapWidth - Arduboy2::width() + 1);
-        _cameraY = constrain(_cameraY, 0, _mapHeight - Arduboy2::height() + 1);
+        int16_t maxX = _mapWidth - Arduboy2::width() + MaxBoundaryPadding;
+        int16_t maxY = _mapHeight - Arduboy2::height() + MaxBoundaryPadding;
+
+        _cameraX = constrain(_cameraX, -MaxBoundaryPadding, maxX);
+        _cameraY = constrain(_cameraY, -MaxBoundaryPadding, maxY);
 
         if (_mapWidth < Arduboy2::width())
-            _cameraX = 0;
+            _cameraX = -MaxBoundaryPadding;
         if (_mapHeight < Arduboy2::height())
-            _cameraY = 0;
+            _cameraY = -MaxBoundaryPadding;
     }
 
     void PrintlnCentered(const String &text)

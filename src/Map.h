@@ -2,8 +2,6 @@
 
 #include <Arduboy2.h>
 
-constexpr uint8_t MaxNumWalls = 20;
-
 struct Point8
 {
     uint8_t x;
@@ -26,8 +24,25 @@ struct Wall
     }
 };
 
+struct Circle
+{
+    Point8 location;
+    uint8_t radius;
+
+    Circle() = default;
+    Circle(uint8_t x, uint8_t y, uint8_t radius)
+    {
+        location = Point8(x, y);
+        radius = radius;
+    }
+};
+
 struct Map
 {
+    static constexpr uint8_t HoleRadius = 3;
+    static constexpr uint8_t MaxNumWalls = 20;
+    static constexpr uint8_t MaxNumCircles = 6;
+
     uint8_t par;
     uint8_t width;
     uint8_t height;
@@ -35,6 +50,5 @@ struct Map
     Point8 end;
     const char *name;
     Wall walls[MaxNumWalls];
-
-    static constexpr uint8_t HoleRadius = 3;
+    Circle circles[MaxNumCircles];
 };
