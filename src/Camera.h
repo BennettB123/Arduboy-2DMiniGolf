@@ -93,7 +93,8 @@ public:
     {
         _arduboy.setCursorY(25);
         PrintlnCentered(map.name);
-        PrintlnCentered("par: " + String(map.par));
+        MoveTextCursorDown(4);
+        PrintlnCentered("par " + String(map.par));
     }
 
     void DrawMapExplorerIndicator()
@@ -110,17 +111,15 @@ public:
 
     void DrawMapComplete(const Map &map, uint8_t strokes)
     {
-        _arduboy.setCursorY(4);
-        PrintlnCentered(F("Hole"));
-        PrintlnCentered(F("Complete!"));
+        _arduboy.setCursorY(10);
+        PrintlnCentered(F("Hole Complete!"));
 
         MoveTextCursorDown(5);
         PrintlnCentered("par " + String(map.par));
-        PrintlnCentered("strokes: " + String(strokes));
+        PrintlnCentered("took " + String(strokes) + " strokes");
 
-        MoveTextCursorDown(5);
-        PrintlnCentered(F("Press any button"));
-        PrintlnCentered(F("to restart"));
+        MoveTextCursorDown(8);
+        PrintlnCentered(F("Press A to continue"));
     }
 
     void MoveUp()

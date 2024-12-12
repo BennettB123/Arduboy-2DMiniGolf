@@ -194,7 +194,7 @@ private:
 
     void HandleInputMapComplete()
     {
-        if (AnyButtonPressed(_arduboy))
+        if (_arduboy.justPressed(A_BUTTON))
             LoadNextMap();
     }
 
