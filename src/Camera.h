@@ -51,7 +51,7 @@ public:
         // draw circles
         for (auto c : map.circles)
         {
-            _arduboy.drawCircle(c.location.x - _cameraX,
+            _arduboy.fillCircle(c.location.x - _cameraX,
                                 c.location.y - _cameraY,
                                 c.radius);
         }
