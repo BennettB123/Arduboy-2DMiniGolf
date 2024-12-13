@@ -18,7 +18,7 @@ private:
     bool _textFlashToggle = false;
 
     static constexpr uint8_t FontWidth = 4;
-    static constexpr uint8_t FontHeight = 6;
+    static constexpr uint8_t FontHeight = 7;
     static constexpr uint8_t HalfScreenWidth = Arduboy2Base::width() / 2;
     static constexpr uint8_t HalfScreenHeight = Arduboy2Base::height() / 2;
     static constexpr uint8_t MaxPowerLineLength = 40;
@@ -109,8 +109,8 @@ public:
 
         if (_textFlashToggle)
         {
-            font4x6.setCursor(1, Arduboy2::height() - 8);
-            font4x6.print(F("View Map"));
+            font4x6.setCursor(0, Arduboy2::height() - FontHeight - 2);
+            PrintOverBlack(F("View Map"));
         }
     }
 
@@ -176,12 +176,59 @@ private:
 
     void PrintlnCentered(const String &text)
     {
-        uint8_t textWidth = (text.length() * FontWidth);
-        textWidth += text.length() - 1; // include pixel between chars
+        uint8_t textWidth = GetTextPixelWidth(text);
         uint8_t offset = HalfScreenWidth - (textWidth / 2);
 
         font4x6.setCursorX(offset);
+        PrintlnOverBlack(text);
+    }
+
+    void PrintOverBlack(const String &text)
+    {
+        DrawBlackBackgroundBehindText(text);
+        font4x6.print(text);
+    }
+
+    void PrintlnOverBlack(const String &text)
+    {
+        DrawBlackBackgroundBehindText(text);
         font4x6.println(text);
+    }
+
+    void DrawBlackBackgroundBehindText(const String &text)
+    {
+        int8_t x = font4x6.getCursorX() - 1;
+        int8_t y = font4x6.getCursorY();
+        uint8_t width = GetTextPixelWidth(text) + 2;
+        uint8_t height = FontHeight + 2;
+
+        _arduboy.fillRect(x, y, width, height, BLACK);
+    }
+
+    void DrawCheckeredRect(uint8_t x, uint8_t y, uint8_t width, uint8_t height)
+    {
+        bool white = true;
+
+        for (uint8_t i = x; i < x + width; i++){ 
+            white = (i % 2 == 0);
+
+            for (uint8_t j = y; j < y + height; j++){
+                if (white)
+                    _arduboy.drawPixel(i, j, WHITE);
+                else
+                    _arduboy.drawPixel(i, j, BLACK);
+
+                white = !white;
+            }
+        }
+    }
+
+    static uint8_t GetTextPixelWidth(const String &text)
+    {
+        uint8_t textWidth = (text.length() * FontWidth);
+        textWidth += text.length() - 1; // include pixel between chars
+
+        return textWidth;
     }
 
     void MoveTextCursorDown(uint8_t offset)
