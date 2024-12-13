@@ -1,31 +1,36 @@
 #pragma once
 
 #include "Ball.h"
+#include "Font4x6/Font4x6.h"
 #include "Map.h"
+#include "MapManager.h"
 #include <Arduboy2.h>
 
 class Camera
 {
 private:
-    Arduboy2 _arduboy;
+    Arduboy2Base _arduboy;
     int16_t _cameraX;
     int16_t _cameraY;
     uint8_t _mapWidth;
     uint8_t _mapHeight;
+    Font4x6 font4x6;
     bool _textFlashToggle = false;
 
-    static constexpr uint8_t FontWidth = 5;
-    static constexpr uint8_t HalfScreenWidth = Arduboy2::width() / 2;
-    static constexpr uint8_t HalfScreenHeight = Arduboy2::height() / 2;
+    static constexpr uint8_t FontWidth = 4;
+    static constexpr uint8_t FontHeight = 6;
+    static constexpr uint8_t HalfScreenWidth = Arduboy2Base::width() / 2;
+    static constexpr uint8_t HalfScreenHeight = Arduboy2Base::height() / 2;
     static constexpr uint8_t MaxPowerLineLength = 40;
     static constexpr uint8_t MinPowerLineLength = 10;
     static constexpr uint8_t MaxBoundaryPadding = 5;
 
 public:
     Camera() = default;
-    Camera(Arduboy2 arduboy, uint8_t x, uint8_t y, uint8_t mapWidth, uint8_t mapHeight)
+    Camera(Arduboy2Base arduboy, uint8_t x, uint8_t y, uint8_t mapWidth, uint8_t mapHeight)
         : _arduboy(arduboy), _mapWidth(mapWidth), _mapHeight(mapHeight)
     {
+        font4x6 = Font4x6();
         FocusOn(x, y);
     }
 
@@ -58,9 +63,9 @@ public:
 
         // draw texture (dots on ground)
         uint8_t dotSpacing = 16;
-        for (int i = dotSpacing/2; i < _mapWidth; i += dotSpacing)
+        for (int i = dotSpacing / 2; i < _mapWidth; i += dotSpacing)
         {
-            for (int j = dotSpacing/2; j < _mapHeight; j += dotSpacing)
+            for (int j = dotSpacing / 2; j < _mapHeight; j += dotSpacing)
             {
                 _arduboy.drawPixel(i - _cameraX, j - _cameraY);
             }
@@ -91,7 +96,7 @@ public:
 
     void DrawMapSummary(const Map &map)
     {
-        _arduboy.setCursorY(25);
+        font4x6.setCursor(0, 25);
         PrintlnCentered(map.name);
         MoveTextCursorDown(4);
         PrintlnCentered("par " + String(map.par));
@@ -104,14 +109,14 @@ public:
 
         if (_textFlashToggle)
         {
-            _arduboy.setCursor(1, Arduboy2::height() - 8);
-            _arduboy.print(F("View Map"));
+            font4x6.setCursor(1, Arduboy2::height() - 8);
+            font4x6.print(F("View Map"));
         }
     }
 
     void DrawMapComplete(const Map &map, uint8_t strokes)
     {
-        _arduboy.setCursorY(10);
+        font4x6.setCursorY(10);
         PrintlnCentered(F("Hole Complete!"));
 
         MoveTextCursorDown(5);
@@ -159,10 +164,14 @@ private:
         int16_t maxX = _mapWidth - Arduboy2::width() + MaxBoundaryPadding;
         int16_t maxY = _mapHeight - Arduboy2::height() + MaxBoundaryPadding;
 
-        if (_cameraX > maxX) _cameraX = maxX;
-        if (_cameraY > maxY) _cameraY = maxY;
-        if (_cameraX < -MaxBoundaryPadding) _cameraX = -MaxBoundaryPadding;
-        if (_cameraY < -MaxBoundaryPadding) _cameraY = -MaxBoundaryPadding;
+        if (_cameraX > maxX)
+            _cameraX = maxX;
+        if (_cameraY > maxY)
+            _cameraY = maxY;
+        if (_cameraX < -MaxBoundaryPadding)
+            _cameraX = -MaxBoundaryPadding;
+        if (_cameraY < -MaxBoundaryPadding)
+            _cameraY = -MaxBoundaryPadding;
     }
 
     void PrintlnCentered(const String &text)
@@ -170,12 +179,13 @@ private:
         uint8_t textWidth = (text.length() * FontWidth);
         textWidth += text.length() - 1; // include pixel between chars
         uint8_t offset = HalfScreenWidth - (textWidth / 2);
-        _arduboy.setCursorX(offset);
-        _arduboy.println(text);
+
+        font4x6.setCursorX(offset);
+        font4x6.println(text);
     }
 
     void MoveTextCursorDown(uint8_t offset)
     {
-        _arduboy.setCursorY(_arduboy.getCursorY() + offset);
+        font4x6.setCursorY(font4x6.getCursorY() + offset);
     }
 };

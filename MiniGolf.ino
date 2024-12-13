@@ -3,7 +3,7 @@
 #include "src/Game.h"
 #include <Arduboy2.h>
 
-Arduboy2 arduboy;
+Arduboy2Base arduboy;
 Game game(arduboy);
 unsigned long previousTime = 0;
 

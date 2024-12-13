@@ -14,23 +14,23 @@ enum class GameState
     ChoosingPower,
     MapExplorer,
     BallInMotion,
-    MapComplete
+    MapComplete,
 };
 
 class Game
 {
 private:
-    Arduboy2 _arduboy;
+    Arduboy2Base _arduboy;
     uint8_t _mapIndex;
     Map _map;
     Camera _camera;
     Ball _ball;
     GameState _gameState;
-    uint8_t _strokes;
+    uint8_t _strokes[MapManager::NumMaps] = { 0 };
     float _secondsDelta;
 
 public:
-    Game(Arduboy2 arduboy) : _arduboy(arduboy)
+    Game(Arduboy2Base arduboy) : _arduboy(arduboy)
     {
     }
 
@@ -41,8 +41,10 @@ public:
         _camera = Camera(_arduboy, 0, 0, _map.width, _map.height);
         _ball = Ball(static_cast<float>(_map.start.x), static_cast<float>(_map.start.y));
         _gameState = GameState::MapSummary;
-        _strokes = 0;
         _secondsDelta = 0;
+
+        for (uint8_t i = 0; i < MapManager::NumMaps; i++)
+            _strokes[i] = 0;
     }
 
     void Tick(float secondsDelta)
@@ -113,7 +115,7 @@ public:
             case GameState::MapComplete:
                 _camera.DrawMap(_map);
                 _camera.DrawBall(_ball);
-                _camera.DrawMapComplete(_map, _strokes);
+                _camera.DrawMapComplete(_map, _strokes[_mapIndex]);
                 break;
         }
     }
@@ -170,7 +172,7 @@ private:
         {
             _gameState = GameState::BallInMotion;
             _ball.StartHit();
-            _strokes++;
+            _strokes[_mapIndex]++;
             return;
         }
     }
@@ -206,11 +208,10 @@ private:
         _camera = Camera(_arduboy, 0, 0, _map.width, _map.height);
         _ball = Ball(static_cast<float>(_map.start.x), static_cast<float>(_map.start.y));
         _gameState = GameState::MapSummary;
-        _strokes = 0;
         _secondsDelta = 0;
     }
 
-    static bool AnyButtonPressed(Arduboy2 arduboy)
+    static bool AnyButtonPressed(Arduboy2Base arduboy)
     {
         return (arduboy.justPressed(UP_BUTTON) ||
                 arduboy.justPressed(DOWN_BUTTON) ||
