@@ -71,7 +71,9 @@ public:
             }
         }
 
-        DrawHole(map.end);
+        _arduboy.drawCircle(map.end.x - _cameraX,
+                            map.end.y - _cameraY,
+                            Map::HoleRadius);
     }
 
     void DrawBall(const Ball &ball)
@@ -97,9 +99,8 @@ public:
     void DrawMapSummary(const Map &map)
     {
         font4x6.setCursor(0, 25);
-        PrintlnCentered(map.name);
-        MoveTextCursorDown(4);
-        PrintlnCentered("par " + String(map.par));
+        PrintCenteredWithBackground(map.name +
+                                    String(F("\npar ")) + String(map.par));
     }
 
     void DrawMapExplorerIndicator()
@@ -109,22 +110,30 @@ public:
 
         if (_textFlashToggle)
         {
-            font4x6.setCursor(0, Arduboy2::height() - FontHeight - 2);
-            PrintOverBlack(F("View Map"));
+            font4x6.setCursor(0, Arduboy2::height() - FontHeight - 1);
+
+            String str = String(F("View Map"));
+
+            Rect bgRect = Rect(font4x6.getCursorX() - 1,
+                               font4x6.getCursorY(),
+                               GetTextPixelWidth(str) + 2,
+                               FontHeight + 1);
+
+            Rect borderRect = ExpandRect(bgRect, 1);
+
+            DrawCheckeredRect(borderRect);
+            _arduboy.fillRect(bgRect.x, bgRect.y, bgRect.width, bgRect.height, BLACK);
+            font4x6.print(str);
         }
     }
 
     void DrawMapComplete(const Map &map, uint8_t strokes)
     {
         font4x6.setCursorY(10);
-        PrintlnCentered(F("Hole Complete!"));
-
-        MoveTextCursorDown(5);
-        PrintlnCentered("par " + String(map.par));
-        PrintlnCentered("took " + String(strokes) + " strokes");
-
-        MoveTextCursorDown(8);
-        PrintlnCentered(F("Press A to continue"));
+        PrintCenteredWithBackground(String(F("Hole Complete!\n")) +
+                                    String(F("par ")) + map.par +
+                                    String(F("\ntook ")) + String(strokes) + String(F(" strokes\n")) +
+                                    String(F("Press A to continue")));
     }
 
     void MoveUp()
@@ -152,13 +161,6 @@ public:
     }
 
 private:
-    void DrawHole(const Point8 &hole)
-    {
-        _arduboy.drawCircle(hole.x - _cameraX,
-                            hole.y - _cameraY,
-                            Map::HoleRadius);
-    }
-
     void KeepInBounds()
     {
         int16_t maxX = _mapWidth - Arduboy2::width() + MaxBoundaryPadding;
@@ -174,45 +176,50 @@ private:
             _cameraY = -MaxBoundaryPadding;
     }
 
-    void PrintlnCentered(const String &text)
+    // Prints the provided text centered on the screen
+    // with a checkered background
+    void PrintCenteredWithBackground(const String &text)
     {
-        uint8_t textWidth = GetTextPixelWidth(text);
-        uint8_t offset = HalfScreenWidth - (textWidth / 2);
+        Rect backgroundRect = GetBoundingRectOfCenteredText(text);
+        backgroundRect = ExpandRect(backgroundRect, 2);
+        DrawCheckeredRect(backgroundRect);
 
-        font4x6.setCursorX(offset);
-        PrintlnOverBlack(text);
+        int8_t lineLength = 0;
+        String temp = String(text);
+
+        do
+        {
+            lineLength = temp.indexOf('\n');
+            if (lineLength < 0)
+                lineLength = temp.length();
+
+            auto line = temp.substring(0, lineLength);
+            temp = temp.substring(lineLength + 1);
+
+            uint8_t textWidth = GetTextPixelWidth(line);
+            uint8_t offset = HalfScreenWidth - (textWidth / 2);
+
+            font4x6.setCursorX(offset);
+            PrintlnCenteredOverBlack(line);
+        } while (temp.length() > 0);
     }
 
-    void PrintOverBlack(const String &text)
+    // Prints the provided text centered on the screen with a black background
+    void PrintlnCenteredOverBlack(const String &text)
     {
-        DrawBlackBackgroundBehindText(text);
-        font4x6.print(text);
-    }
-
-    void PrintlnOverBlack(const String &text)
-    {
-        DrawBlackBackgroundBehindText(text);
+        Rect rect = GetBoundingRectOfCenteredText(text);
+        _arduboy.fillRect(rect.x, rect.y, rect.width, rect.height, BLACK);
         font4x6.println(text);
     }
 
-    void DrawBlackBackgroundBehindText(const String &text)
+    void DrawCheckeredRect(Rect rect)
     {
-        int8_t x = font4x6.getCursorX() - 1;
-        int8_t y = font4x6.getCursorY();
-        uint8_t width = GetTextPixelWidth(text) + 2;
-        uint8_t height = FontHeight + 2;
+        for (int16_t i = rect.x; i < rect.x + rect.width; i++)
+        {
+            bool white = (i % 2 == 0);
 
-        _arduboy.fillRect(x, y, width, height, BLACK);
-    }
-
-    void DrawCheckeredRect(uint8_t x, uint8_t y, uint8_t width, uint8_t height)
-    {
-        bool white = true;
-
-        for (uint8_t i = x; i < x + width; i++){ 
-            white = (i % 2 == 0);
-
-            for (uint8_t j = y; j < y + height; j++){
+            for (int16_t j = rect.y; j < rect.y + rect.height; j++)
+            {
                 if (white)
                     _arduboy.drawPixel(i, j, WHITE);
                 else
@@ -221,6 +228,47 @@ private:
                 white = !white;
             }
         }
+    }
+
+    // Returns a Rect that represents the boundary of a block of text.
+    // Margin of 2 pixels on left/right, and margin of 1 pixel on top/bottom.
+    // Provided text can contain multiple lines.
+    Rect GetBoundingRectOfCenteredText(const String &text)
+    {
+        int8_t lineLength = 0;
+        uint8_t largestStr = 0;
+        uint8_t numLines = 0;
+        String temp = String(text);
+
+        do
+        {
+            // get next line of text
+            lineLength = temp.indexOf('\n');
+            if (lineLength < 0)
+                lineLength = temp.length();
+
+            auto line = temp.substring(0, lineLength);
+            temp = temp.substring(lineLength + 1);
+
+            largestStr = max(largestStr, line.length());
+            numLines++;
+        } while (temp.length() > 0);
+
+        uint8_t width = (largestStr * FontWidth);
+        width += largestStr - 1; // include pixel between chars
+        width += 4;              // account for 2 pixel margin on left/right
+
+        uint8_t x = (HalfScreenWidth - (width / 2));
+        uint8_t y = font4x6.getCursorY();
+        uint8_t height = (numLines * FontHeight) + (numLines - 1);
+        height += 2; // account for 1 pixel margin on top/bottom
+
+        return Rect(x, y, width, height);
+    }
+
+    Rect ExpandRect(const Rect &rect, uint8_t i)
+    {
+        return Rect(rect.x - i, rect.y - i, rect.width + i * 2, rect.height + i * 2);
     }
 
     static uint8_t GetTextPixelWidth(const String &text)
