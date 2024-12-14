@@ -14,7 +14,7 @@ private:
     int16_t _cameraY;
     uint8_t _mapWidth;
     uint8_t _mapHeight;
-    Font4x6 font4x6;
+    Font4x6 _font4x6;
     bool _textFlashToggle = false;
 
     static constexpr uint8_t FontWidth = 4;
@@ -30,7 +30,7 @@ public:
     Camera(Arduboy2Base arduboy, uint8_t x, uint8_t y, uint8_t mapWidth, uint8_t mapHeight)
         : _arduboy(arduboy), _mapWidth(mapWidth), _mapHeight(mapHeight)
     {
-        font4x6 = Font4x6();
+        _font4x6 = Font4x6();
         FocusOn(x, y);
     }
 
@@ -98,7 +98,7 @@ public:
 
     void DrawMapSummary(const Map &map)
     {
-        font4x6.setCursor(0, 25);
+        _font4x6.setCursor(0, 25);
         PrintCenteredWithBackground(map.name +
                                     String(F("\npar ")) + String(map.par));
     }
@@ -123,7 +123,7 @@ public:
 
     void DrawMapComplete(const Map &map, uint8_t strokes)
     {
-        font4x6.setCursorY(10);
+        _font4x6.setCursorY(10);
         PrintCenteredWithBackground(String(F("Hole Complete!\n")) +
                                     String(F("par ")) + map.par +
                                     String(F("\ntook ")) + String(strokes) + String(F(" strokes\n")) +
@@ -172,10 +172,10 @@ private:
 
     void DrawTextBottomLeft(const String &text)
     {
-        font4x6.setCursor(0, Arduboy2::height() - FontHeight - 1);
+        _font4x6.setCursor(0, Arduboy2::height() - FontHeight - 1);
 
-        Rect bgRect = Rect(font4x6.getCursorX() - 1,
-                           font4x6.getCursorY(),
+        Rect bgRect = Rect(_font4x6.getCursorX() - 1,
+                           _font4x6.getCursorY(),
                            GetTextPixelWidth(text) + 2,
                            FontHeight + 1);
 
@@ -183,7 +183,7 @@ private:
 
         DrawCheckeredBorder(borderRect);
         _arduboy.fillRect(bgRect.x, bgRect.y, bgRect.width, bgRect.height, BLACK);
-        font4x6.print(text);
+        _font4x6.print(text);
     }
 
     // Prints the provided text centered on the screen
@@ -209,7 +209,7 @@ private:
             uint8_t textWidth = GetTextPixelWidth(line);
             uint8_t offset = HalfScreenWidth - (textWidth / 2);
 
-            font4x6.setCursorX(offset);
+            _font4x6.setCursorX(offset);
             PrintlnCenteredOverBlack(line);
         } while (temp.length() > 0);
     }
@@ -219,7 +219,7 @@ private:
     {
         Rect rect = GetBoundingRectOfCenteredText(text);
         _arduboy.fillRect(rect.x, rect.y, rect.width, rect.height, BLACK);
-        font4x6.println(text);
+        _font4x6.println(text);
     }
 
     // Draws a black rectangle with the provided Rect with a
@@ -273,7 +273,7 @@ private:
         width += 4;              // account for 2 pixel margin on left/right
 
         uint8_t x = (HalfScreenWidth - (width / 2));
-        uint8_t y = font4x6.getCursorY();
+        uint8_t y = _font4x6.getCursorY();
         uint8_t height = (numLines * FontHeight) + (numLines - 1);
         height += 2; // account for 1 pixel margin on top/bottom
 
@@ -295,6 +295,6 @@ private:
 
     void MoveTextCursorDown(uint8_t offset)
     {
-        font4x6.setCursorY(font4x6.getCursorY() + offset);
+        _font4x6.setCursorY(_font4x6.getCursorY() + offset);
     }
 };
