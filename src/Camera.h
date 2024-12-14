@@ -130,6 +130,20 @@ public:
                                     String(F("Press A to continue")));
     }
 
+    void DrawGameSummary(uint8_t (&strokes)[MapManager::NumMaps], uint8_t totalPar)
+    {
+        uint16_t totalStrokes = 0;
+        for (uint8_t i = 0; i < MapManager::NumMaps; i++)
+            totalStrokes += strokes[i];
+
+
+        _font4x6.setCursorY(12);
+        PrintCenteredWithBackground(String(F("All 18 Holes Completed!\n\n")) +
+                                    String(F("Final Score\n")) +
+                                    String(F("Total Par:     ")) + totalPar + String(F("\n")) +
+                                    String(F("Total Strokes: ")) + totalStrokes);
+    }
+
     void MoveUp()
     {
         _cameraY -= 2;

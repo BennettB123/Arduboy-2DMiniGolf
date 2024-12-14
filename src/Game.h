@@ -15,6 +15,7 @@ enum class GameState
     MapExplorer,
     BallInMotion,
     MapComplete,
+    GameSummary,
 };
 
 class Game
@@ -109,6 +110,9 @@ public:
                 _camera.DrawBall(_ball);
                 _camera.DrawMapComplete(_map, _strokes[_mapIndex]);
                 break;
+            case GameState::GameSummary:
+                _camera.DrawGameSummary(_strokes, MapManager::GetTotalPar());
+                break;
         }
     }
 
@@ -134,6 +138,9 @@ private:
                 break;
             case GameState::MapComplete:
                 HandleInputMapComplete();
+                break;
+            case GameState::GameSummary:
+                HandleInputGameSummary();
                 break;
         }
     }
@@ -201,7 +208,21 @@ private:
     void HandleInputMapComplete()
     {
         if (_arduboy.justPressed(A_BUTTON))
-            LoadNextMap();
+        {
+            if (_mapIndex >= MapManager::NumMaps - 1)
+            {
+                _gameState = GameState::GameSummary;
+            }
+            else {
+                LoadNextMap();
+            }
+        }
+    }
+    
+    void HandleInputGameSummary() {
+        // for now, just restart the game
+        if (_arduboy.justPressed(A_BUTTON))
+            Init();
     }
 
     void TickBallInMotion()

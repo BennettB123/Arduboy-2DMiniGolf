@@ -23,8 +23,26 @@ public:
         return map;
     }
 
+    static uint8_t GetTotalPar()
+    {
+        uint8_t total = 0;
+        Map map;
+
+        for (uint8_t i = 0; i < NumMaps; i++)
+        {
+            // read Map from FX data
+            FX::seekArrayElement<Map>(Maps, i);
+            FX::readObject(map);
+            FX::readEnd();
+
+            total += map.par;
+        }
+
+        return total;
+    }
+
 private:
-    static const char* mapNames[NumMaps];
+    static const char *mapNames[NumMaps];
 };
 
 const char *MapManager::mapNames[MapManager::NumMaps] = {
