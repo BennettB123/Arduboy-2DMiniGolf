@@ -109,22 +109,16 @@ public:
             _textFlashToggle = !_textFlashToggle;
 
         if (_textFlashToggle)
-        {
-            font4x6.setCursor(0, Arduboy2::height() - FontHeight - 1);
+            DrawTextBottomLeft("View Map");
+    }
 
-            String str = String(F("View Map"));
+    void DrawDoubleSpeedIndicator()
+    {
+        if (_arduboy.everyXFrames(30))
+            _textFlashToggle = !_textFlashToggle;
 
-            Rect bgRect = Rect(font4x6.getCursorX() - 1,
-                               font4x6.getCursorY(),
-                               GetTextPixelWidth(str) + 2,
-                               FontHeight + 1);
-
-            Rect borderRect = ExpandRect(bgRect, 1);
-
-            DrawCheckeredBorder(borderRect);
-            _arduboy.fillRect(bgRect.x, bgRect.y, bgRect.width, bgRect.height, BLACK);
-            font4x6.print(str);
-        }
+        if (_textFlashToggle)
+            DrawTextBottomLeft("2x");
     }
 
     void DrawMapComplete(const Map &map, uint8_t strokes)
@@ -174,6 +168,22 @@ private:
             _cameraX = -MaxBoundaryPadding;
         if (_cameraY < -MaxBoundaryPadding)
             _cameraY = -MaxBoundaryPadding;
+    }
+
+    void DrawTextBottomLeft(const String &text)
+    {
+        font4x6.setCursor(0, Arduboy2::height() - FontHeight - 1);
+
+        Rect bgRect = Rect(font4x6.getCursorX() - 1,
+                           font4x6.getCursorY(),
+                           GetTextPixelWidth(text) + 2,
+                           FontHeight + 1);
+
+        Rect borderRect = ExpandRect(bgRect, 1);
+
+        DrawCheckeredBorder(borderRect);
+        _arduboy.fillRect(bgRect.x, bgRect.y, bgRect.width, bgRect.height, BLACK);
+        font4x6.print(text);
     }
 
     // Prints the provided text centered on the screen
@@ -226,7 +236,7 @@ private:
                 // only draw if we're on the border
                 if (i >= margin && i < rect.width - margin &&
                     j >= margin && j < rect.height - margin)
-                        continue;
+                    continue;
 
                 if (i % 2 == 1 ^ j % 2 == 0)
                     _arduboy.drawPixel(i + rect.x, j + rect.y, WHITE);

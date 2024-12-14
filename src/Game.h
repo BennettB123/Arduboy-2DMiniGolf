@@ -26,8 +26,9 @@ private:
     Camera _camera;
     Ball _ball;
     GameState _gameState;
-    uint8_t _strokes[MapManager::NumMaps] = { 0 };
+    uint8_t _strokes[MapManager::NumMaps] = {0};
     float _secondsDelta;
+    bool _doubleSpeedEnabled;
 
 public:
     Game(Arduboy2Base arduboy) : _arduboy(arduboy)
@@ -42,6 +43,7 @@ public:
         _ball = Ball(static_cast<float>(_map.start.x), static_cast<float>(_map.start.y));
         _gameState = GameState::MapSummary;
         _secondsDelta = 0;
+        _doubleSpeedEnabled = false;
 
         for (uint8_t i = 0; i < MapManager::NumMaps; i++)
             _strokes[i] = 0;
@@ -60,23 +62,11 @@ public:
 
         if (_gameState == GameState::BallInMotion)
         {
-            _ball.Move(secondsDelta);
+            TickBallInMotion();
 
-            if (_ball.IsStopped())
-            {
-                _gameState = GameState::Aiming;
-                _ball.ResetPower();
-            }
-
-            CollisionHandler::HandleAllCollisions(_ball, _map);
-
-            if (CollisionHandler::BallInHole(_ball, _map))
-            {
-                _ball.X = _map.end.x;
-                _ball.Y = _map.end.y;
-                _ball.Velocity = {0, 0};
-                _gameState = GameState::MapComplete;
-            }
+            // move ball twice per tick if in 2x speed
+            if (_doubleSpeedEnabled)
+                TickBallInMotion();
         }
 
         if (_gameState != GameState::MapExplorer)
@@ -111,6 +101,8 @@ public:
             case GameState::BallInMotion:
                 _camera.DrawMap(_map);
                 _camera.DrawBall(_ball);
+                if (_doubleSpeedEnabled)
+                    _camera.DrawDoubleSpeedIndicator();
                 break;
             case GameState::MapComplete:
                 _camera.DrawMap(_map);
@@ -136,6 +128,9 @@ private:
                 break;
             case GameState::MapExplorer:
                 HandleInputMapExplorer();
+                break;
+            case GameState::BallInMotion:
+                HandleInputBallInMotion();
                 break;
             case GameState::MapComplete:
                 HandleInputMapComplete();
@@ -194,10 +189,41 @@ private:
         }
     }
 
+    void HandleInputBallInMotion()
+    {
+        // only start double speed upon a new button press
+        if (!_doubleSpeedEnabled)
+            _doubleSpeedEnabled = _arduboy.justPressed(A_BUTTON);
+        else
+            _doubleSpeedEnabled = _arduboy.pressed(A_BUTTON);
+    }
+
     void HandleInputMapComplete()
     {
-        if (_arduboy.pressed(A_BUTTON))
+        if (_arduboy.justPressed(A_BUTTON))
             LoadNextMap();
+    }
+
+    void TickBallInMotion()
+    {
+        _ball.Move(_secondsDelta);
+
+        if (_ball.IsStopped())
+        {
+            _gameState = GameState::Aiming;
+            _ball.ResetPower();
+            _doubleSpeedEnabled = false;
+        }
+
+        CollisionHandler::HandleAllCollisions(_ball, _map);
+
+        if (CollisionHandler::BallInHole(_ball, _map))
+        {
+            _ball.X = _map.end.x;
+            _ball.Y = _map.end.y;
+            _ball.Velocity = {0, 0};
+            _gameState = GameState::MapComplete;
+        }
     }
 
     void LoadNextMap()
