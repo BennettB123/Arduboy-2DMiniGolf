@@ -121,7 +121,7 @@ public:
 
             Rect borderRect = ExpandRect(bgRect, 1);
 
-            DrawCheckeredRect(borderRect);
+            DrawCheckeredBorder(borderRect);
             _arduboy.fillRect(bgRect.x, bgRect.y, bgRect.width, bgRect.height, BLACK);
             font4x6.print(str);
         }
@@ -182,7 +182,7 @@ private:
     {
         Rect backgroundRect = GetBoundingRectOfCenteredText(text);
         backgroundRect = ExpandRect(backgroundRect, 2);
-        DrawCheckeredRect(backgroundRect);
+        DrawCheckeredBorder(backgroundRect);
 
         int8_t lineLength = 0;
         String temp = String(text);
@@ -212,20 +212,24 @@ private:
         font4x6.println(text);
     }
 
-    void DrawCheckeredRect(Rect rect)
+    // Draws a black rectangle with the provided Rect with a
+    // checkered background 2 pixels wide
+    void DrawCheckeredBorder(Rect rect)
     {
-        for (int16_t i = rect.x; i < rect.x + rect.width; i++)
+        uint8_t margin = 2;
+        _arduboy.fillRect(rect.x, rect.y, rect.width, rect.height, BLACK);
+
+        for (int16_t i = 0; i < rect.width; i++)
         {
-            bool white = (i % 2 == 0);
-
-            for (int16_t j = rect.y; j < rect.y + rect.height; j++)
+            for (int16_t j = 0; j < rect.height; j++)
             {
-                if (white)
-                    _arduboy.drawPixel(i, j, WHITE);
-                else
-                    _arduboy.drawPixel(i, j, BLACK);
+                // only draw if we're on the border
+                if (i >= margin && i < rect.width - margin &&
+                    j >= margin && j < rect.height - margin)
+                        continue;
 
-                white = !white;
+                if (i % 2 == 1 ^ j % 2 == 0)
+                    _arduboy.drawPixel(i + rect.x, j + rect.y, WHITE);
             }
         }
     }
