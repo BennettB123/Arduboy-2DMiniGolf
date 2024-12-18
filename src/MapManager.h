@@ -7,7 +7,7 @@
 class MapManager
 {
 public:
-    static const uint8_t NumMaps = 2;
+    static const uint8_t NumMaps = 3;
 
     static Map LoadMap(uint8_t index)
     {
@@ -47,4 +47,5 @@ private:
 
 const char *MapManager::mapNames[MapManager::NumMaps] = {
     "Squiggly Lane",
-    "Round Rodeo"};
+    "Round Rodeo",
+    "The Desert"};

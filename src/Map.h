@@ -37,11 +37,26 @@ struct Circle
     }
 };
 
+struct SandTrap
+{
+    static constexpr float FrictionMultiplier = 6; // each frame, apply extra friction to the ball
+
+    uint8_t x;
+    uint8_t y;
+    uint8_t width;
+    uint8_t height;
+
+    SandTrap() = default;
+    SandTrap(uint8_t x, uint8_t y, uint8_t width, uint8_t height)
+        : x(x), y(y), width(width), height(height) {}
+};
+
 struct Map
 {
     static constexpr uint8_t HoleRadius = 3;
     static constexpr uint8_t MaxNumWalls = 20;
-    static constexpr uint8_t MaxNumCircles = 6;
+    static constexpr uint8_t MaxNumCircles = 4;
+    static constexpr uint8_t MaxNumSandTraps = 4;
 
     uint8_t par;
     uint8_t width;
@@ -51,4 +66,5 @@ struct Map
     const char *name;
     Wall walls[MaxNumWalls];
     Circle circles[MaxNumCircles];
+    SandTrap sandTraps[MaxNumSandTraps];
 };

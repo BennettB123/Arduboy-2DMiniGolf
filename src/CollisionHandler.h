@@ -9,7 +9,7 @@ class CollisionHandler
     CollisionHandler() = delete; // enforce this to be a static class
 
 public:
-    static void HandleAllCollisions(Ball &ball, const Map &map)
+    static void HandleAllCollisions(Ball &ball, const Map &map, float secondsDelta)
     {
         for (auto wall : map.walls)
         {
@@ -56,6 +56,12 @@ public:
 
             if (IsCollidingCircle(ball, circle))
                 HandleCollisionCircle(ball, circle);
+        }
+
+        for (auto sandTrap : map.sandTraps)
+        {
+            if (IsCollidingSandTrap(ball, sandTrap))
+                HandleCollisionSandTrap(ball, sandTrap, secondsDelta);
         }
     }
 
@@ -149,7 +155,7 @@ private:
         }
     }
 
-    static bool IsCollidingCircle(Ball &ball, const Circle &circle)
+    static bool IsCollidingCircle(const Ball &ball, const Circle &circle)
     {
         Vector circleToBall = {ball.X - circle.location.x, ball.Y - circle.location.y};
         float distance = circleToBall.Length();
@@ -172,5 +178,20 @@ private:
         float dotProduct = ball.Velocity.x * normal.x + ball.Velocity.y * normal.y;
         ball.Velocity.x -= 2 * dotProduct * normal.x;
         ball.Velocity.y -= 2 * dotProduct * normal.y;
+    }
+
+    static bool IsCollidingSandTrap(Ball &ball, const SandTrap &sand)
+    {
+        Rect ballRect = Rect(ball.X, ball.Y, 0, 0);
+        Rect sandRect = Rect(sand.x, sand.y, sand.width, sand.height);
+        return Arduboy2::collide(ballRect, sandRect);
+    }
+
+    static void HandleCollisionSandTrap(Ball &ball, const SandTrap &sand, float secondsDelta)
+    {
+        for (uint8_t i = 0; i < SandTrap::FrictionMultiplier; i++)
+        {
+            ball.ApplyFriction(secondsDelta);
+        }
     }
 };

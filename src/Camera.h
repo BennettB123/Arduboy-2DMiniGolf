@@ -44,6 +44,16 @@ public:
 
     void DrawMap(const Map &map)
     {
+        // draw floor texture (dots on ground)
+        uint8_t dotSpacing = 16;
+        for (int i = dotSpacing / 2; i < _mapWidth; i += dotSpacing)
+        {
+            for (int j = dotSpacing / 2; j < _mapHeight; j += dotSpacing)
+            {
+                _arduboy.drawPixel(i - _cameraX, j - _cameraY);
+            }
+        }
+
         // draw walls
         for (auto wall : map.walls)
         {
@@ -61,16 +71,33 @@ public:
                                 c.radius);
         }
 
-        // draw texture (dots on ground)
-        uint8_t dotSpacing = 16;
-        for (int i = dotSpacing / 2; i < _mapWidth; i += dotSpacing)
+        // draw sand traps
+        uint8_t gridWidth = 4;
+        for (auto c : map.sandTraps)
         {
-            for (int j = dotSpacing / 2; j < _mapHeight; j += dotSpacing)
+            DrawCheckeredBorder(Rect(c.x - _cameraX, c.y - _cameraY, c.width, c.height), 1);
+            for (uint8_t i = 1; i < c.width - 1; i++)
             {
-                _arduboy.drawPixel(i - _cameraX, j - _cameraY);
+                for (uint8_t j = 1; j < c.height - 1; j++)
+                {
+                    if (i % gridWidth != 0 || j % gridWidth != 0)
+                        continue;
+
+                    // shift even rows down
+                    if (i % (gridWidth * 2) == 0)
+                    {
+                        _arduboy.drawPixel(i + c.x - _cameraX, (j + c.y - 1) - _cameraY, WHITE);
+                    }
+                    // shift odd rows down
+                    else if (i % gridWidth == 0)
+                    {
+                        _arduboy.drawPixel(i + c.x - _cameraX, (j + c.y + 1) - _cameraY, WHITE);
+                    }
+                }
             }
         }
 
+        // draw hole
         _arduboy.drawCircle(map.end.x - _cameraX,
                             map.end.y - _cameraY,
                             Map::HoleRadius);
@@ -135,7 +162,6 @@ public:
         uint16_t totalStrokes = 0;
         for (uint8_t i = 0; i < MapManager::NumMaps; i++)
             totalStrokes += strokes[i];
-
 
         _font4x6.setCursorY(12);
         PrintCenteredWithBackground(String(F("All 18 Holes Completed!\n\n")) +
@@ -237,10 +263,9 @@ private:
     }
 
     // Draws a black rectangle with the provided Rect with a
-    // checkered background 2 pixels wide
-    void DrawCheckeredBorder(Rect rect)
+    // checkered border 'margin' pixels wide
+    void DrawCheckeredBorder(Rect rect, uint8_t margin = 2)
     {
-        uint8_t margin = 2;
         _arduboy.fillRect(rect.x, rect.y, rect.width, rect.height, BLACK);
 
         for (int16_t i = 0; i < rect.width; i++)

@@ -76,6 +76,11 @@ public:
         X += Velocity.x * secondsDelta;
         Y += Velocity.y * secondsDelta;
 
+        ApplyFriction(secondsDelta);
+    }
+
+    void ApplyFriction(float secondsDelta)
+    {
         Velocity.x -= Velocity.x * _friction * secondsDelta;
         Velocity.y -= Velocity.y * _friction * secondsDelta;
 

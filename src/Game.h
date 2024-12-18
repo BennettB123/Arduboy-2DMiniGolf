@@ -236,7 +236,7 @@ private:
             _doubleSpeedEnabled = false;
         }
 
-        CollisionHandler::HandleAllCollisions(_ball, _map);
+        CollisionHandler::HandleAllCollisions(_ball, _map, _secondsDelta);
 
         if (CollisionHandler::BallInHole(_ball, _map))
         {
