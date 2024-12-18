@@ -72,27 +72,25 @@ public:
         }
 
         // draw sand traps
-        uint8_t gridWidth = 4;
+        uint8_t gridWidth = 5;
         for (auto c : map.sandTraps)
         {
             DrawCheckeredBorder(Rect(c.x - _cameraX, c.y - _cameraY, c.width, c.height), 1);
-            for (uint8_t i = 1; i < c.width - 1; i++)
-            {
-                for (uint8_t j = 1; j < c.height - 1; j++)
-                {
-                    if (i % gridWidth != 0 || j % gridWidth != 0)
-                        continue;
 
-                    // shift even rows down
-                    if (i % (gridWidth * 2) == 0)
-                    {
-                        _arduboy.drawPixel(i + c.x - _cameraX, (j + c.y - 1) - _cameraY, WHITE);
-                    }
-                    // shift odd rows down
-                    else if (i % gridWidth == 0)
-                    {
-                        _arduboy.drawPixel(i + c.x - _cameraX, (j + c.y + 1) - _cameraY, WHITE);
-                    }
+            for (uint8_t i = gridWidth; i < c.width - 1; i += gridWidth)
+            {
+                uint8_t offset = 0;
+
+                // shift even rows down
+                if (i % (gridWidth * 2) == 0)
+                    offset = -1;
+                // shift odd rows down
+                else if (i % gridWidth == 0)
+                    offset = 1;
+
+                for (uint8_t j = gridWidth + offset; j < c.height - 1; j += gridWidth)
+                {
+                    _arduboy.drawPixel(i + c.x - _cameraX, (j + c.y) - _cameraY, WHITE);
                 }
             }
         }
@@ -262,25 +260,36 @@ private:
         _font4x6.println(text);
     }
 
-    // Draws a black rectangle with the provided Rect with a
-    // checkered border 'margin' pixels wide
+    // Draws a black rectangle on the provided Rect with a
+    // checkered border that is 'margin' pixels wide
     void DrawCheckeredBorder(Rect rect, uint8_t margin = 2)
     {
         _arduboy.fillRect(rect.x, rect.y, rect.width, rect.height, BLACK);
 
+        // Each border is its own for loop for better performance (only loop over the borders)
+        // Top border
         for (int16_t i = 0; i < rect.width; i++)
-        {
-            for (int16_t j = 0; j < rect.height; j++)
-            {
-                // only draw if we're on the border
-                if (i >= margin && i < rect.width - margin &&
-                    j >= margin && j < rect.height - margin)
-                    continue;
-
+            for (int16_t j = 0; j < margin; j++)
                 if (i % 2 == 1 ^ j % 2 == 0)
                     _arduboy.drawPixel(i + rect.x, j + rect.y, WHITE);
-            }
-        }
+
+        // Bottom border
+        for (int16_t i = 0; i < rect.width; i++)
+            for (int16_t j = rect.height - margin; j < rect.height; j++)
+                if (i % 2 == 1 ^ j % 2 == 0)
+                    _arduboy.drawPixel(i + rect.x, j + rect.y, WHITE);
+
+        // Left border
+        for (int16_t i = 0; i < margin; i++)
+            for (int16_t j = 0; j < rect.height; j++)
+                if (i % 2 == 1 ^ j % 2 == 0)
+                    _arduboy.drawPixel(i + rect.x, j + rect.y, WHITE);
+
+        // Right border
+        for (int16_t i = rect.width - margin; i < rect.width; i++)
+            for (int16_t j = 0; j < rect.height; j++)
+                if (i % 2 == 1 ^ j % 2 == 0)
+                    _arduboy.drawPixel(i + rect.x, j + rect.y, WHITE);
     }
 
     // Returns a Rect that represents the boundary of a block of text.
