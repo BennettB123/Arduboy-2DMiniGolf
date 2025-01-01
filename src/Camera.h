@@ -19,8 +19,8 @@ private:
 
     static constexpr uint8_t FontWidth = 4;
     static constexpr uint8_t FontHeight = 7;
-    static constexpr uint8_t HalfScreenWidth = Arduboy2Base::width() / 2;
-    static constexpr uint8_t HalfScreenHeight = Arduboy2Base::height() / 2;
+    static constexpr uint8_t HalfScreenWidth = WIDTH / 2;
+    static constexpr uint8_t HalfScreenHeight = HEIGHT / 2;
     static constexpr uint8_t MaxPowerLineLength = 40;
     static constexpr uint8_t MinPowerLineLength = 10;
     static constexpr uint8_t MaxBoundaryPadding = 5;
@@ -75,7 +75,7 @@ public:
         uint8_t gridWidth = 5;
         for (auto c : map.sandTraps)
         {
-            DrawCheckeredBorder(Rect(c.x - _cameraX, c.y - _cameraY, c.width, c.height), 1);
+            DrawDottedBorder(Rect(c.x - _cameraX, c.y - _cameraY, c.width, c.height));
 
             for (uint8_t i = gridWidth; i < c.width - 1; i += gridWidth)
             {
@@ -195,8 +195,8 @@ public:
 private:
     void KeepInBounds()
     {
-        int16_t maxX = _mapWidth - Arduboy2::width() + MaxBoundaryPadding;
-        int16_t maxY = _mapHeight - Arduboy2::height() + MaxBoundaryPadding;
+        int16_t maxX = _mapWidth - WIDTH + MaxBoundaryPadding;
+        int16_t maxY = _mapHeight - HEIGHT + MaxBoundaryPadding;
 
         if (_cameraX > maxX)
             _cameraX = maxX;
@@ -210,7 +210,7 @@ private:
 
     void DrawTextBottomLeft(const String &text)
     {
-        _font4x6.setCursor(0, Arduboy2::height() - FontHeight - 1);
+        _font4x6.setCursor(0, HEIGHT - FontHeight - 1);
 
         Rect bgRect = Rect(_font4x6.getCursorX() - 1,
                            _font4x6.getCursorY(),
@@ -219,7 +219,7 @@ private:
 
         Rect borderRect = ExpandRect(bgRect, 1);
 
-        DrawCheckeredBorder(borderRect);
+        DrawDottedBorder(borderRect);
         _arduboy.fillRect(bgRect.x, bgRect.y, bgRect.width, bgRect.height, BLACK);
         _font4x6.print(text);
     }
@@ -230,7 +230,7 @@ private:
     {
         Rect backgroundRect = GetBoundingRectOfCenteredText(text);
         backgroundRect = ExpandRect(backgroundRect, 2);
-        DrawCheckeredBorder(backgroundRect);
+        DrawDottedBorder(backgroundRect);
 
         int8_t lineLength = 0;
         String temp = String(text);
@@ -260,36 +260,43 @@ private:
         _font4x6.println(text);
     }
 
-    // Draws a black rectangle on the provided Rect with a
-    // checkered border that is 'margin' pixels wide
-    void DrawCheckeredBorder(Rect rect, uint8_t margin = 2)
+    // Draws a black rectangle on the provided Rect with a dotted border
+    void DrawDottedBorder(const Rect &rect)
     {
         _arduboy.fillRect(rect.x, rect.y, rect.width, rect.height, BLACK);
 
-        // Each border is its own for loop for better performance (only loop over the borders)
+        uint16_t x = 0;
+        uint16_t y = 0;
+
         // Top border
-        for (int16_t i = 0; i < rect.width; i++)
-            for (int16_t j = 0; j < margin; j++)
-                if (i % 2 == 1 ^ j % 2 == 0)
-                    _arduboy.drawPixel(i + rect.x, j + rect.y, WHITE);
+        for (x = 0; x < rect.width; x++)
+        {
+            if ((x % 2 == 1) ^ true)
+                _arduboy.drawPixel(x + rect.x, rect.y);
+        }
 
         // Bottom border
-        for (int16_t i = 0; i < rect.width; i++)
-            for (int16_t j = rect.height - margin; j < rect.height; j++)
-                if (i % 2 == 1 ^ j % 2 == 0)
-                    _arduboy.drawPixel(i + rect.x, j + rect.y, WHITE);
+        for (x = 0; x < rect.width; x++)
+        {
+            y = rect.height - 1;
+            if ((x % 2 == 1) ^ (y % 2 == 0))
+                _arduboy.drawPixel(x + rect.x, y + rect.y);
+        }
 
         // Left border
-        for (int16_t i = 0; i < margin; i++)
-            for (int16_t j = 0; j < rect.height; j++)
-                if (i % 2 == 1 ^ j % 2 == 0)
-                    _arduboy.drawPixel(i + rect.x, j + rect.y, WHITE);
+        for (y = 0; y < rect.height; y++)
+        {
+            if ((y % 2 == 0) ^ false)
+                _arduboy.drawPixel(rect.x, y + rect.y);
+        }
 
         // Right border
-        for (int16_t i = rect.width - margin; i < rect.width; i++)
-            for (int16_t j = 0; j < rect.height; j++)
-                if (i % 2 == 1 ^ j % 2 == 0)
-                    _arduboy.drawPixel(i + rect.x, j + rect.y, WHITE);
+        for (y = 0; y < rect.height; y++)
+        {
+            x = rect.width - 1;
+            if (x % 2 == 1 ^ y % 2 == 0)
+                _arduboy.drawPixel(x + rect.x, y + rect.y);
+        }
     }
 
     // Returns a Rect that represents the boundary of a block of text.

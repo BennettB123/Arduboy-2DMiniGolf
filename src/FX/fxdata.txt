@@ -90,7 +90,7 @@ uint8_t Maps = {
     // Map 2 (The Desert)
     {
         // par, width,  height, start,  end
-        4,      128,    64,     5, 5,   123, 59,
+        3,      128,    64,     5, 5,   123, 59,
 
         // empty Map.name (char* is 2 bytes)
         0, 0 
@@ -124,8 +124,8 @@ uint8_t Maps = {
         0, 0, 0,
         
         // SandTraps
-        25, 25, 25, 25,
-        75, 10, 20, 40,
+        16, 16, 96, 32,
+        0, 0, 0, 0,
         0, 0, 0, 0
         0, 0, 0, 0
     },
