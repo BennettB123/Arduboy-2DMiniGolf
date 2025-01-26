@@ -14,6 +14,7 @@ private:
     int16_t _cameraY;
     uint8_t _mapWidth;
     uint8_t _mapHeight;
+    uint8_t _treadmillFrame = 0;
     Font4x6 _font4x6;
     bool _textFlashToggle = false;
 
@@ -57,6 +58,9 @@ public:
         // draw walls
         for (auto wall : map.walls)
         {
+            if (wall.IsEmpty())
+                continue;
+
             _arduboy.drawLine(wall.p1.x - _cameraX,
                               wall.p1.y - _cameraY,
                               wall.p2.x - _cameraX,
@@ -64,20 +68,26 @@ public:
         }
 
         // draw circles
-        for (auto c : map.circles)
+        for (auto circle : map.circles)
         {
-            _arduboy.fillCircle(c.location.x - _cameraX,
-                                c.location.y - _cameraY,
-                                c.radius);
+            if (circle.IsEmpty())
+                continue;
+
+            _arduboy.fillCircle(circle.location.x - _cameraX,
+                                circle.location.y - _cameraY,
+                                circle.radius);
         }
 
         // draw sand traps
         uint8_t gridWidth = 5;
-        for (auto c : map.sandTraps)
+        for (auto sandtrap : map.sandTraps)
         {
-            DrawDottedBorder(Rect(c.x - _cameraX, c.y - _cameraY, c.width, c.height));
+            if (sandtrap.IsEmpty())
+                continue;
 
-            for (uint8_t i = gridWidth; i < c.width - 1; i += gridWidth)
+            DrawDottedBorder(Rect(sandtrap.x - _cameraX, sandtrap.y - _cameraY, sandtrap.width, sandtrap.height));
+
+            for (uint8_t i = gridWidth; i < sandtrap.width - 1; i += gridWidth)
             {
                 uint8_t offset = 0;
 
@@ -88,17 +98,52 @@ public:
                 else if (i % gridWidth == 0)
                     offset = 1;
 
-                for (uint8_t j = gridWidth + offset; j < c.height - 1; j += gridWidth)
+                for (uint8_t j = gridWidth + offset; j < sandtrap.height - 1; j += gridWidth)
                 {
-                    _arduboy.drawPixel(i + c.x - _cameraX, (j + c.y) - _cameraY, WHITE);
+                    _arduboy.drawPixel(i + sandtrap.x - _cameraX, (j + sandtrap.y) - _cameraY, WHITE);
                 }
             }
+        }
+
+        // draw treadmills
+        for (auto tread : map.treadmills)
+        {
+            if (tread.IsEmpty())
+                continue;
+
+            DrawDottedBorder(Rect(tread.x - _cameraX - 1, tread.y - _cameraY - 1, tread.width + 2, tread.height + 2));
+            
+            uint24_t sprite = 0;
+            switch (tread.direction){
+                case Direction::Up: 
+                    sprite = TreadmillUp;
+                    break;
+                case Direction::Down: 
+                    sprite = TreadmillDown;
+                    break;
+                case Direction::Left: 
+                    sprite = TreadmillLeft;
+                    break;
+                case Direction::Right: 
+                    sprite = TreadmillRight;
+                    break;
+            }
+
+            for (uint8_t x = 0; x < tread.width; x += TreadmillUpWidth)
+                for (uint8_t y = 0; y < tread.height; y += TreadmillUpHeight)
+                    FX::drawBitmap(x + tread.x - _cameraX,
+                                   y + tread.y - _cameraY,
+                                   sprite, _treadmillFrame, dbmMasked); // only dmbMasked works (bug?) other modes draw wrong sprite
         }
 
         // draw hole
         _arduboy.drawCircle(map.end.x - _cameraX,
                             map.end.y - _cameraY,
                             Map::HoleRadius);
+
+        // cycle sprite frames
+        if (_arduboy.everyXFrames(10))
+            _treadmillFrame = ++_treadmillFrame % TreadmillUpFrames;
     }
 
     void DrawBall(const Ball &ball)

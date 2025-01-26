@@ -13,10 +13,7 @@ public:
     {
         for (auto wall : map.walls)
         {
-            if (wall.p1.x == 0 &&
-                wall.p1.y == 0 &&
-                wall.p2.x == 0 &&
-                wall.p2.y == 0)
+            if (wall.IsEmpty())
                 continue;
 
             if (IsCollidingWall(ball, wall))
@@ -49,9 +46,7 @@ public:
 
         for (auto circle : map.circles)
         {
-            if (circle.location.x == 0 &&
-                circle.location.y == 0 &&
-                circle.radius == 0)
+            if (circle.IsEmpty())
                 continue;
 
             if (IsCollidingCircle(ball, circle))
@@ -60,6 +55,9 @@ public:
 
         for (auto sandTrap : map.sandTraps)
         {
+            if (sandTrap.IsEmpty())
+                continue;
+
             if (IsCollidingSandTrap(ball, sandTrap))
                 HandleCollisionSandTrap(ball, sandTrap, secondsDelta);
         }

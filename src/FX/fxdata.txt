@@ -1,5 +1,10 @@
-// Contains Map data to be stored on the Arduboy FX chip
+// Contains Sprites and Map data to be stored on the Arduboy FX chip
     
+image_t TreadmillUp = "../Assets/TreadmillUp_8x8.png"
+image_t TreadmillDown = "../Assets/TreadmillDown_8x8.png"
+image_t TreadmillLeft = "../Assets/TreadmillLeft_8x8.png"
+image_t TreadmillRight = "../Assets/TreadmillRight_8x8.png"
+
 uint8_t Maps = {
     // Map 1 (Squiggly Lane)
     {
@@ -42,6 +47,12 @@ uint8_t Maps = {
         0, 0, 0, 0
         0, 0, 0, 0
         0, 0, 0, 0
+
+        // Treadmills
+        0, 0, 0, 0, 0
+        0, 0, 0, 0, 0
+        0, 0, 0, 0, 0
+        0, 0, 0, 0, 0
     },
 
     // Map 2 (Round Rodeo)
@@ -85,9 +96,15 @@ uint8_t Maps = {
         0, 0, 0, 0
         0, 0, 0, 0
         0, 0, 0, 0
+
+        // Treadmills
+        0, 0, 0, 0, 0
+        0, 0, 0, 0, 0
+        0, 0, 0, 0, 0
+        0, 0, 0, 0, 0
     },
 
-    // Map 2 (The Desert)
+    // Map 3 (The Desert)
     {
         // par, width,  height, start,  end
         3,      128,    64,     5, 5,   123, 59,
@@ -128,5 +145,60 @@ uint8_t Maps = {
         0, 0, 0, 0,
         0, 0, 0, 0
         0, 0, 0, 0
+        
+        // Treadmills
+        0, 0, 0, 0, 0
+        0, 0, 0, 0, 0
+        0, 0, 0, 0, 0
+        0, 0, 0, 0, 0
+    },
+
+    // Map 4 (Treadmill Land)
+    {
+        // par, width,  height, start,  end
+        3,      200,    60,     5, 30, 195, 30,
+
+        // empty Map.name (char* is 2 bytes)
+        0, 0 
+
+        // Walls
+        0, 0, 200, 0,
+        200, 0, 200, 60,
+        200, 60, 0, 60,
+        0, 60, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+
+        // Circles
+        0, 0, 0,
+        0, 0, 0,
+        0, 0, 0,
+        0, 0, 0,
+        
+        // SandTraps
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0
+        
+        // Treadmills
+        20, 20, 16, 16, 0
+        44, 20, 16, 16, 1
+        68, 20, 16, 16, 2
+        92, 20, 16, 16, 3
     },
 }
