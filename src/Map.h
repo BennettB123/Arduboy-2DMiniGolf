@@ -81,7 +81,7 @@ enum class Direction : uint8_t
 
 struct Treadmill
 {
-    static constexpr float Speed = 2;
+    static constexpr float Speed = 100; // velocity added to ball every second
 
     uint8_t x;
     uint8_t y;

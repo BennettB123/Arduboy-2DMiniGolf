@@ -5,16 +5,19 @@
 class Ball
 {
 private:
-    bool _powerIncreasing = true;
     static constexpr float _friction = .60;           // percentage to reduce velocity by every second
-    static constexpr float _minVelocityThreshold = 3; // stop the ball when velocity is below this threshold
     static constexpr uint8_t _powerChangePerSecond = 100;
     static constexpr float _aimChangePerSecond = 1.75;
+    static constexpr float _minVelocityThreshold = 4;
+    static constexpr float _minVelocitySecondsThreshold = 1; // stop the ball when velocity < threshold for this many seconds
+
+    bool _powerIncreasing = true;
+    float _minVelocitySeconds = 0; // how long velocity has been below the minThreshold
 
 public:
     float X = 0, Y = 0;
     Vector Velocity = {0, 0};   // used for when the ball is in motion
-    float Direction = 0;        // used for choosing which direction to hit the ball
+    float Direction = 0;        // used for choosing which direction to hit the ball (units = radians)
     float Power = DefaultPower; // how hard to hit the ball
 
     static constexpr uint8_t Radius = 2;
@@ -69,6 +72,7 @@ public:
     {
         Velocity.x = cos(Direction) * Power;
         Velocity.y = -sin(Direction) * Power;
+        _minVelocitySeconds = 0;
     }
 
     void Move(float secondsDelta)
@@ -85,11 +89,13 @@ public:
         Velocity.y -= Velocity.y * _friction * secondsDelta;
 
         if (Velocity.Length() < _minVelocityThreshold)
-            Velocity = {0, 0};
+            _minVelocitySeconds += secondsDelta;
+        else
+            _minVelocitySeconds = 0;
     }
 
     bool IsStopped()
     {
-        return Velocity.x == 0 && Velocity.y == 0;
+        return _minVelocitySeconds >= _minVelocitySecondsThreshold;
     }
 };

@@ -61,6 +61,15 @@ public:
             if (IsCollidingSandTrap(ball, sandTrap))
                 HandleCollisionSandTrap(ball, sandTrap, secondsDelta);
         }
+
+        for (auto treadmill : map.treadmills)
+        {
+            if (treadmill.IsEmpty())
+                continue;
+
+            if (IsCollidingTreadmill(ball, treadmill))
+                HandleCollisionTreadmill(ball, treadmill, secondsDelta);
+        }
     }
 
     static bool BallInHole(Ball &ball, const Map &map)
@@ -180,7 +189,7 @@ private:
 
     static bool IsCollidingSandTrap(Ball &ball, const SandTrap &sand)
     {
-        Rect ballRect = Rect(ball.X, ball.Y, 0, 0);
+        Rect ballRect = GetBallHitbox(ball);
         Rect sandRect = Rect(sand.x, sand.y, sand.width, sand.height);
         return Arduboy2::collide(ballRect, sandRect);
     }
@@ -191,5 +200,37 @@ private:
         {
             ball.ApplyFriction(secondsDelta);
         }
+    }
+
+    static bool IsCollidingTreadmill(Ball &ball, const Treadmill &treadmill)
+    {
+        Rect ballRect = GetBallHitbox(ball);
+        Rect teadRect = Rect(treadmill.x, treadmill.y, treadmill.width, treadmill.height);
+        return Arduboy2::collide(ballRect, teadRect);
+    }
+
+    static void HandleCollisionTreadmill(Ball &ball, const Treadmill &treadmill, float secondsDelta)
+    {
+        auto velocityDelta = Treadmill::Speed * secondsDelta;
+
+        switch (treadmill.direction) {
+            case Direction::Up:
+                ball.Velocity.y -= velocityDelta;
+                break;
+            case Direction::Down:
+                ball.Velocity.y += velocityDelta;
+                break;
+            case Direction::Left:
+                ball.Velocity.x -= velocityDelta;
+                break;
+            case Direction::Right:
+                ball.Velocity.x += velocityDelta;
+                break;
+        }
+    }
+
+    static Rect GetBallHitbox(const Ball &ball)
+    {
+        return Rect(ball.X - Ball::Radius, ball.Y - Ball::Radius, Ball::Radius * 2, Ball::Radius * 2);
     }
 };
