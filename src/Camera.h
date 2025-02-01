@@ -55,18 +55,6 @@ public:
             }
         }
 
-        // draw walls
-        for (auto wall : map.walls)
-        {
-            if (wall.IsEmpty())
-                continue;
-
-            _arduboy.drawLine(wall.p1.x - _cameraX,
-                              wall.p1.y - _cameraY,
-                              wall.p2.x - _cameraX,
-                              wall.p2.y - _cameraY);
-        }
-
         // draw circles
         for (auto circle : map.circles)
         {
@@ -110,8 +98,6 @@ public:
         {
             if (tread.IsEmpty())
                 continue;
-
-            DrawDottedBorder(Rect(tread.x - _cameraX - 1, tread.y - _cameraY - 1, tread.width + 2, tread.height + 2));
             
             uint24_t sprite = 0;
             switch (tread.direction){
@@ -136,13 +122,25 @@ public:
                                    sprite, _treadmillFrame, dbmMasked); // only dmbMasked works (bug?) other modes draw wrong sprite
         }
 
+        // draw walls
+        for (auto wall : map.walls)
+        {
+            if (wall.IsEmpty())
+                continue;
+
+            _arduboy.drawLine(wall.p1.x - _cameraX,
+                              wall.p1.y - _cameraY,
+                              wall.p2.x - _cameraX,
+                              wall.p2.y - _cameraY);
+        }
+
         // draw hole
         _arduboy.drawCircle(map.end.x - _cameraX,
                             map.end.y - _cameraY,
                             Map::HoleRadius);
 
         // cycle sprite frames
-        if (_arduboy.everyXFrames(10))
+        if (_arduboy.everyXFrames(5))
             _treadmillFrame = ++_treadmillFrame % TreadmillUpFrames;
     }
 
