@@ -231,6 +231,6 @@ private:
 
     static Rect GetBallHitbox(const Ball &ball)
     {
-        return Rect(ball.X, ball.Y, 0, 0);
+        return Rect(ball.X - 1, ball.Y - 1, 2, 2);
     }
 };
