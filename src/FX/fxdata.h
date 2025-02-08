@@ -6,8 +6,8 @@ using uint24_t = __uint24;
 
 // Initialize FX hardware using  FX::begin(FX_DATA_PAGE); in the setup() function.
 
-constexpr uint16_t FX_DATA_PAGE  = 0xfffb;
-constexpr uint24_t FX_DATA_BYTES = 1238;
+constexpr uint16_t FX_DATA_PAGE  = 0xfffa;
+constexpr uint24_t FX_DATA_BYTES = 1380;
 
 constexpr uint24_t TreadmillUp = 0x000000;
 constexpr uint16_t TreadmillUpWidth  = 8;
