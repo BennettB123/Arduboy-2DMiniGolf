@@ -56,6 +56,7 @@ public:
         }
 
         // draw circles
+        // TODO: don't draw if off screen
         for (auto circle : map.circles)
         {
             if (circle.IsEmpty())
@@ -67,6 +68,7 @@ public:
         }
 
         // draw sand traps
+        // TODO: turn into 8x8 sprite (like treadmill)
         uint8_t gridWidth = 5;
         for (auto sandtrap : map.sandTraps)
         {
@@ -115,14 +117,25 @@ public:
                     break;
             }
 
-            for (uint8_t x = 0; x < tread.width; x += TreadmillUpWidth)
-                for (uint8_t y = 0; y < tread.height; y += TreadmillUpHeight)
-                    FX::drawBitmap(x + tread.x - _cameraX,
-                                   y + tread.y - _cameraY,
+            for (uint8_t x = 0; x < tread.width; x += TreadmillUpWidth) {
+                int16_t drawX = x + tread.x - _cameraX;
+                if (drawX < -(int8_t)TreadmillUpWidth || drawX > WIDTH)
+                    continue;
+
+                for (uint8_t y = 0; y < tread.height; y += TreadmillUpHeight){
+                    int16_t drawY = y + tread.y - _cameraY;
+                    if (drawY < -(int8_t)TreadmillUpHeight || drawY > HEIGHT)
+                        continue;
+
+                    FX::drawBitmap(drawX,
+                                   drawY,
                                    sprite, _treadmillFrame, dbmMasked); // only dmbMasked works (bug?) other modes draw wrong sprite
+                }
+            }
         }
 
         // draw walls
+        // TODO: don't draw if off screen
         for (auto wall : map.walls)
         {
             if (wall.IsEmpty())
