@@ -56,10 +56,13 @@ public:
         }
 
         // draw circles
-        // TODO: don't draw if off screen
         for (auto circle : map.circles)
         {
             if (circle.IsEmpty())
+                continue;
+
+            if (circle.location.x + circle.radius - _cameraX < 0 || circle.location.x - circle.radius -  _cameraX > WIDTH ||
+                circle.location.y + circle.radius - _cameraY < 0 || circle.location.y - circle.radius - _cameraY > HEIGHT)
                 continue;
 
             _arduboy.fillCircle(circle.location.x - _cameraX,
