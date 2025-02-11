@@ -61,13 +61,14 @@ public:
             if (circle.IsEmpty())
                 continue;
 
-            if (circle.location.x + circle.radius - _cameraX < 0 || circle.location.x - circle.radius -  _cameraX > WIDTH ||
-                circle.location.y + circle.radius - _cameraY < 0 || circle.location.y - circle.radius - _cameraY > HEIGHT)
+            int16_t drawX = circle.location.x - _cameraX;
+            int16_t drawY = circle.location.y - _cameraY;
+
+            if (drawX + circle.radius < 0 || drawX - circle.radius > WIDTH ||
+                drawY + circle.radius < 0 || drawY - circle.radius > HEIGHT)
                 continue;
 
-            _arduboy.fillCircle(circle.location.x - _cameraX,
-                                circle.location.y - _cameraY,
-                                circle.radius);
+            _arduboy.fillCircle(drawX, drawY, circle.radius);
         }
 
         // draw sand traps
@@ -138,7 +139,6 @@ public:
         }
 
         // draw walls
-        // TODO: don't draw if off screen
         for (auto wall : map.walls)
         {
             if (wall.IsEmpty())
@@ -151,9 +151,7 @@ public:
         }
 
         // draw hole
-        _arduboy.drawCircle(map.end.x - _cameraX,
-                            map.end.y - _cameraY,
-                            Map::HoleRadius);
+        _arduboy.drawCircle(map.end.x - _cameraX, map.end.y - _cameraY, Map::HoleRadius);
 
         // cycle sprite frames
         if (_arduboy.everyXFrames(5))
