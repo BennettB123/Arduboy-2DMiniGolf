@@ -55,6 +55,43 @@ public:
             }
         }
 
+        // draw treadmills
+        for (auto tread : map.treadmills)
+        {
+            if (tread.IsEmpty())
+                continue;
+            
+            uint24_t sprite = 0;
+            switch (tread.direction){
+                case Direction::Up: 
+                    sprite = TreadmillUp;
+                    break;
+                case Direction::Down: 
+                    sprite = TreadmillDown;
+                    break;
+                case Direction::Left: 
+                    sprite = TreadmillLeft;
+                    break;
+                case Direction::Right: 
+                    sprite = TreadmillRight;
+                    break;
+            }
+
+            for (uint8_t x = 0; x < tread.width; x += TreadmillUpWidth) {
+                int16_t drawX = x + tread.x - _cameraX;
+                if (drawX < -(int8_t)TreadmillUpWidth || drawX > WIDTH)
+                    continue;
+
+                for (uint8_t y = 0; y < tread.height; y += TreadmillUpHeight){
+                    int16_t drawY = y + tread.y - _cameraY;
+                    if (drawY < -(int8_t)TreadmillUpHeight || drawY > HEIGHT)
+                        continue;
+
+                    FX::drawBitmap(drawX, drawY, sprite, _treadmillFrame, dbmNormal);
+                }
+            }
+        }
+
         // draw circles
         for (auto circle : map.circles)
         {
@@ -95,45 +132,6 @@ public:
                 for (uint8_t j = gridWidth + offset; j < sandtrap.height - 1; j += gridWidth)
                 {
                     _arduboy.drawPixel(i + sandtrap.x - _cameraX, (j + sandtrap.y) - _cameraY, WHITE);
-                }
-            }
-        }
-
-        // draw treadmills
-        for (auto tread : map.treadmills)
-        {
-            if (tread.IsEmpty())
-                continue;
-            
-            uint24_t sprite = 0;
-            switch (tread.direction){
-                case Direction::Up: 
-                    sprite = TreadmillUp;
-                    break;
-                case Direction::Down: 
-                    sprite = TreadmillDown;
-                    break;
-                case Direction::Left: 
-                    sprite = TreadmillLeft;
-                    break;
-                case Direction::Right: 
-                    sprite = TreadmillRight;
-                    break;
-            }
-
-            for (uint8_t x = 0; x < tread.width; x += TreadmillUpWidth) {
-                int16_t drawX = x + tread.x - _cameraX;
-                if (drawX < -(int8_t)TreadmillUpWidth || drawX > WIDTH)
-                    continue;
-
-                for (uint8_t y = 0; y < tread.height; y += TreadmillUpHeight){
-                    int16_t drawY = y + tread.y - _cameraY;
-                    if (drawY < -(int8_t)TreadmillUpHeight || drawY > HEIGHT)
-                        continue;
-
-                    FX::drawBitmap(drawX,
-                                   drawY,
-                                   sprite, _treadmillFrame, dbmMasked); // only dmbMasked works (bug?) other modes draw wrong sprite
                 }
             }
         }
