@@ -227,23 +227,33 @@ private:
 
     void TickBallInMotion()
     {
-        _ball.Move(_secondsDelta);
+        // do a couple collision checks per tick
+        //  (less likely to miss a collision at high speeds)
+        uint8_t numCollisionChecks = 2;
+        float updatedDelta = _secondsDelta / numCollisionChecks;
 
-        if (_ball.IsStopped())
+        for (uint8_t i = 0; i < numCollisionChecks; i++)
         {
-            _gameState = GameState::Aiming;
-            _ball.ResetPower();
-            _doubleSpeedEnabled = false;
-        }
-
-        CollisionHandler::HandleAllCollisions(_ball, _map, _secondsDelta);
-
-        if (CollisionHandler::BallInHole(_ball, _map))
-        {
-            _ball.X = _map.end.x;
-            _ball.Y = _map.end.y;
-            _ball.Velocity = {0, 0};
-            _gameState = GameState::MapComplete;
+            _ball.Move(updatedDelta);
+    
+            if (_ball.IsStopped())
+            {
+                _gameState = GameState::Aiming;
+                _ball.ResetPower();
+                _doubleSpeedEnabled = false;
+                break;
+            }
+    
+            CollisionHandler::HandleAllCollisions(_ball, _map, updatedDelta);
+    
+            if (CollisionHandler::BallInHole(_ball, _map))
+            {
+                _ball.X = _map.end.x;
+                _ball.Y = _map.end.y;
+                _ball.Velocity = {0, 0};
+                _gameState = GameState::MapComplete;
+                break;
+            }
         }
     }
 
