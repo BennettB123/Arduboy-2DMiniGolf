@@ -1,9 +1,10 @@
 // Contains Sprites and Map data to be stored on the Arduboy FX chip
     
-image_t TreadmillUp = "../Assets/TreadmillUp_8x8.png"
-image_t TreadmillDown = "../Assets/TreadmillDown_8x8.png"
-image_t TreadmillLeft = "../Assets/TreadmillLeft_8x8.png"
-image_t TreadmillRight = "../Assets/TreadmillRight_8x8.png"
+image_t TreadmillUpSprite = "../Assets/TreadmillUp_8x8.png"
+image_t TreadmillDownSprite = "../Assets/TreadmillDown_8x8.png"
+image_t TreadmillLeftSprite = "../Assets/TreadmillLeft_8x8.png"
+image_t TreadmillRightSprite = "../Assets/TreadmillRight_8x8.png"
+image_t SandtrapSprite = "../Assets/Sandtrap.png"
 
 uint8_t Maps = {
     // Map 1 (Squiggly Lane)
@@ -353,10 +354,10 @@ uint8_t Maps = {
         0, 0, 0,
 
         // SandTraps
-        0, 0, 33, 32
-        192, 0, 33, 32
-        192, 128, 33, 33
-        0, 128, 33, 33
+        0, 0, 32, 32
+        192, 0, 32, 32
+        192, 128, 32, 32
+        0, 128, 32, 32
 
         // Treadmills
         0, 32, 32, 32, 3

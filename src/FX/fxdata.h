@@ -7,26 +7,30 @@ using uint24_t = __uint24;
 // Initialize FX hardware using  FX::begin(FX_DATA_PAGE); in the setup() function.
 
 constexpr uint16_t FX_DATA_PAGE  = 0xfffa;
-constexpr uint24_t FX_DATA_BYTES = 1476;
+constexpr uint24_t FX_DATA_BYTES = 1488;
 
-constexpr uint24_t TreadmillUp = 0x000000;
-constexpr uint16_t TreadmillUpWidth  = 8;
-constexpr uint16_t TreadmillUpHeight = 8;
-constexpr uint8_t  TreadmillUpFrames = 8;
+constexpr uint24_t TreadmillUpSprite = 0x000000;
+constexpr uint16_t TreadmillUpSpriteWidth  = 8;
+constexpr uint16_t TreadmillUpSpriteHeight = 8;
+constexpr uint8_t  TreadmillUpSpriteFrames = 8;
 
-constexpr uint24_t TreadmillDown = 0x000044;
-constexpr uint16_t TreadmillDownWidth  = 8;
-constexpr uint16_t TreadmillDownHeight = 8;
-constexpr uint8_t  TreadmillDownFrames = 8;
+constexpr uint24_t TreadmillDownSprite = 0x000044;
+constexpr uint16_t TreadmillDownSpriteWidth  = 8;
+constexpr uint16_t TreadmillDownSpriteHeight = 8;
+constexpr uint8_t  TreadmillDownSpriteFrames = 8;
 
-constexpr uint24_t TreadmillLeft = 0x000088;
-constexpr uint16_t TreadmillLeftWidth  = 8;
-constexpr uint16_t TreadmillLeftHeight = 8;
-constexpr uint8_t  TreadmillLeftFrames = 8;
+constexpr uint24_t TreadmillLeftSprite = 0x000088;
+constexpr uint16_t TreadmillLeftSpriteWidth  = 8;
+constexpr uint16_t TreadmillLeftSpriteHeight = 8;
+constexpr uint8_t  TreadmillLeftSpriteFrames = 8;
 
-constexpr uint24_t TreadmillRight = 0x0000CC;
-constexpr uint16_t TreadmillRightWidth  = 8;
-constexpr uint16_t TreadmillRightHeight = 8;
-constexpr uint8_t  TreadmillRightFrames = 8;
+constexpr uint24_t TreadmillRightSprite = 0x0000CC;
+constexpr uint16_t TreadmillRightSpriteWidth  = 8;
+constexpr uint16_t TreadmillRightSpriteHeight = 8;
+constexpr uint8_t  TreadmillRightSpriteFrames = 8;
 
-constexpr uint24_t Maps = 0x000110;
+constexpr uint24_t SandtrapSprite = 0x000110;
+constexpr uint16_t SandtrapSpriteWidth  = 8;
+constexpr uint16_t SandtrapSpriteHeight = 8;
+
+constexpr uint24_t Maps = 0x00011C;

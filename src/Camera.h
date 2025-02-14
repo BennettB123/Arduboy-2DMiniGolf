@@ -64,27 +64,27 @@ public:
             uint24_t sprite = 0;
             switch (tread.direction){
                 case Direction::Up: 
-                    sprite = TreadmillUp;
+                    sprite = TreadmillUpSprite;
                     break;
                 case Direction::Down: 
-                    sprite = TreadmillDown;
+                    sprite = TreadmillDownSprite;
                     break;
                 case Direction::Left: 
-                    sprite = TreadmillLeft;
+                    sprite = TreadmillLeftSprite;
                     break;
                 case Direction::Right: 
-                    sprite = TreadmillRight;
+                    sprite = TreadmillRightSprite;
                     break;
             }
 
-            for (uint8_t x = 0; x < tread.width; x += TreadmillUpWidth) {
+            for (uint8_t x = 0; x < tread.width; x += TreadmillUpSpriteWidth) {
                 int16_t drawX = x + tread.x - _cameraX;
-                if (drawX < -(int8_t)TreadmillUpWidth || drawX > WIDTH)
+                if (drawX < -(int8_t)TreadmillUpSpriteWidth || drawX > WIDTH)
                     continue;
 
-                for (uint8_t y = 0; y < tread.height; y += TreadmillUpHeight){
+                for (uint8_t y = 0; y < tread.height; y += TreadmillUpSpriteHeight){
                     int16_t drawY = y + tread.y - _cameraY;
-                    if (drawY < -(int8_t)TreadmillUpHeight || drawY > HEIGHT)
+                    if (drawY < -(int8_t)TreadmillUpSpriteHeight || drawY > HEIGHT)
                         continue;
 
                     FX::drawBitmap(drawX, drawY, sprite, _treadmillFrame, dbmNormal);
@@ -109,29 +109,23 @@ public:
         }
 
         // draw sand traps
-        // TODO: turn into 8x8 sprite (like treadmill)
         uint8_t gridWidth = 5;
         for (auto sandtrap : map.sandTraps)
         {
             if (sandtrap.IsEmpty())
                 continue;
 
-            DrawDottedBorder(Rect(sandtrap.x - _cameraX, sandtrap.y - _cameraY, sandtrap.width, sandtrap.height));
+            for (uint8_t x = 0; x < sandtrap.width; x += SandtrapSpriteWidth) {
+                int16_t drawX = x + sandtrap.x - _cameraX;
+                if (drawX < -(int8_t)SandtrapSpriteWidth || drawX > WIDTH)
+                    continue;
 
-            for (uint8_t i = gridWidth; i < sandtrap.width - 1; i += gridWidth)
-            {
-                uint8_t offset = 0;
+                for (uint8_t y = 0; y < sandtrap.height; y += SandtrapSpriteHeight){
+                    int16_t drawY = y + sandtrap.y - _cameraY;
+                    if (drawY < -(int8_t)SandtrapSpriteHeight || drawY > HEIGHT)
+                        continue;
 
-                // shift even rows down
-                if (i % (gridWidth * 2) == 0)
-                    offset = -1;
-                // shift odd rows down
-                else if (i % gridWidth == 0)
-                    offset = 1;
-
-                for (uint8_t j = gridWidth + offset; j < sandtrap.height - 1; j += gridWidth)
-                {
-                    _arduboy.drawPixel(i + sandtrap.x - _cameraX, (j + sandtrap.y) - _cameraY, WHITE);
+                    FX::drawBitmap(drawX, drawY, SandtrapSprite, 0, dbmNormal);
                 }
             }
         }
@@ -153,7 +147,7 @@ public:
 
         // cycle sprite frames
         if (_arduboy.everyXFrames(5))
-            _treadmillFrame = ++_treadmillFrame % TreadmillUpFrames;
+            _treadmillFrame = ++_treadmillFrame % TreadmillUpSpriteFrames;
     }
 
     void DrawBall(const Ball &ball)
