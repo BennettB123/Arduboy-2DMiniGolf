@@ -39,7 +39,7 @@ public:
 
     void Init()
     {
-        _mapIndex = 7;
+        _mapIndex = 0;
         _map = MapManager::LoadMap(_mapIndex);
         _camera = Camera(_arduboy, 0, 0, _map.width, _map.height);
         _ball = Ball(static_cast<float>(_map.start.x), static_cast<float>(_map.start.y));
