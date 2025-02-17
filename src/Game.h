@@ -83,32 +83,38 @@ public:
             case GameState::MapSummary:
                 _camera.DrawMap(_map);
                 _camera.DrawBall(_ball);
+                _camera.DrawHole(_map.end.x, _map.end.y, !IsBallNearHole());
                 _camera.DrawMapSummary(_map);
                 break;
             case GameState::Aiming:
                 _camera.DrawMap(_map);
                 _camera.DrawBall(_ball);
+                _camera.DrawHole(_map.end.x, _map.end.y, !IsBallNearHole());
                 _camera.DrawAimHud(_ball);
                 break;
             case GameState::ChoosingPower:
                 _camera.DrawMap(_map);
                 _camera.DrawBall(_ball);
+                _camera.DrawHole(_map.end.x, _map.end.y, !IsBallNearHole());
                 _camera.DrawAimHud(_ball);
                 break;
             case GameState::MapExplorer:
                 _camera.DrawMap(_map);
                 _camera.DrawBall(_ball);
+                _camera.DrawHole(_map.end.x, _map.end.y, !IsBallNearHole());
                 _camera.DrawAimHud(_ball);
                 _camera.DrawMapExplorerIndicator();
                 break;
             case GameState::BallInMotion:
                 _camera.DrawMap(_map);
                 _camera.DrawBall(_ball);
+                _camera.DrawHole(_map.end.x, _map.end.y, !IsBallNearHole());
                 if (_doubleSpeedEnabled)
                     _camera.DrawDoubleSpeedIndicator();
                 break;
             case GameState::MapComplete:
                 _camera.DrawMap(_map);
+                _camera.DrawHole(_map.end.x, _map.end.y, !IsBallNearHole());
                 _camera.DrawBall(_ball);
                 _camera.DrawMapComplete(_map, _strokes[_mapIndex]);
                 break;
@@ -215,13 +221,15 @@ private:
             {
                 _gameState = GameState::GameSummary;
             }
-            else {
+            else
+            {
                 LoadNextMap();
             }
         }
     }
-    
-    void HandleInputGameSummary() {
+
+    void HandleInputGameSummary()
+    {
         // for now, just restart the game
         if (_arduboy.justPressed(A_BUTTON))
             Init();
@@ -237,7 +245,7 @@ private:
         for (uint8_t i = 0; i < numCollisionChecks; i++)
         {
             _ball.Move(updatedDelta);
-    
+
             if (_ball.IsStopped())
             {
                 _gameState = GameState::Aiming;
@@ -245,9 +253,9 @@ private:
                 _doubleSpeedEnabled = false;
                 break;
             }
-    
+
             CollisionHandler::HandleAllCollisions(_ball, _map, updatedDelta);
-    
+
             if (CollisionHandler::BallInHole(_ball, _map))
             {
                 _ball.X = _map.end.x;
@@ -268,6 +276,11 @@ private:
         _ball = Ball(static_cast<float>(_map.start.x), static_cast<float>(_map.start.y));
         _gameState = GameState::MapSummary;
         _secondsDelta = 0;
+    }
+
+    bool IsBallNearHole()
+    {
+        return CollisionHandler::Distance(_ball.X, _ball.Y, _map.end.x, _map.end.y) <= 25;
     }
 
     static bool AnyButtonPressed(Arduboy2Base arduboy)

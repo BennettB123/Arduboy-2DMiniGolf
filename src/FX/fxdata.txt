@@ -5,6 +5,8 @@ image_t TreadmillDownSprite = "../Assets/TreadmillDown_8x8.png"
 image_t TreadmillLeftSprite = "../Assets/TreadmillLeft_8x8.png"
 image_t TreadmillRightSprite = "../Assets/TreadmillRight_8x8.png"
 image_t SandtrapSprite = "../Assets/Sandtrap.png"
+image_t HoleNoFlagSprite = "../Assets/HoleNoFlag_8x8.png"
+image_t HoleWithFlagSprite = "../Assets/HoleWithFlag_8x16.png"
 
 uint8_t Maps = {
     // Map 1 (Squiggly Lane)
@@ -325,7 +327,7 @@ uint8_t Maps = {
     // Map 6 (Options)
     {
         // par, width, height, start,   end
-        4,      224,   160,    188, 80, 208, 80
+        4,      224,   160,    188, 80, 216, 80
 
         // empty Map.name (char* is 2 bytes)
         0, 0 

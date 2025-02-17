@@ -75,15 +75,15 @@ public:
     static bool BallInHole(Ball &ball, const Map &map)
     {
         float dist = Distance(ball.X, ball.Y, map.end.x, map.end.y);
-        return dist <= Map::HoleRadius;
+        return dist <= Map::HoleRadius - 1;
     }
 
-private:
     static float Distance(float x1, float y1, float x2, float y2)
     {
         return sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
     }
 
+private:
     static bool IsCollidingWall(const Ball &ball, const Wall &wall)
     {
         // Wall vector

@@ -15,6 +15,7 @@ private:
     uint8_t _mapWidth;
     uint8_t _mapHeight;
     uint8_t _treadmillFrame = 0;
+    uint8_t _holeFrame = 0;
     Font4x6 _font4x6;
     bool _textFlashToggle = false;
 
@@ -25,6 +26,10 @@ private:
     static constexpr uint8_t MaxPowerLineLength = 40;
     static constexpr uint8_t MinPowerLineLength = 10;
     static constexpr uint8_t MaxBoundaryPadding = 5;
+    static constexpr int8_t HoleNoFlagXOffset = -3;
+    static constexpr int8_t HoleNoFlagYOffset = -3;
+    static constexpr int8_t HoleWithFlagXOffset = -4;
+    static constexpr int8_t HoleWithFlagYOffset = -11;
 
 public:
     Camera() = default;
@@ -60,29 +65,32 @@ public:
         {
             if (tread.IsEmpty())
                 continue;
-            
+
             uint24_t sprite = 0;
-            switch (tread.direction){
-                case Direction::Up: 
+            switch (tread.direction)
+            {
+                case Direction::Up:
                     sprite = TreadmillUpSprite;
                     break;
-                case Direction::Down: 
+                case Direction::Down:
                     sprite = TreadmillDownSprite;
                     break;
-                case Direction::Left: 
+                case Direction::Left:
                     sprite = TreadmillLeftSprite;
                     break;
-                case Direction::Right: 
+                case Direction::Right:
                     sprite = TreadmillRightSprite;
                     break;
             }
 
-            for (uint8_t x = 0; x < tread.width; x += TreadmillUpSpriteWidth) {
+            for (uint8_t x = 0; x < tread.width; x += TreadmillUpSpriteWidth)
+            {
                 int16_t drawX = x + tread.x - _cameraX;
                 if (drawX < -(int8_t)TreadmillUpSpriteWidth || drawX > WIDTH)
                     continue;
 
-                for (uint8_t y = 0; y < tread.height; y += TreadmillUpSpriteHeight){
+                for (uint8_t y = 0; y < tread.height; y += TreadmillUpSpriteHeight)
+                {
                     int16_t drawY = y + tread.y - _cameraY;
                     if (drawY < -(int8_t)TreadmillUpSpriteHeight || drawY > HEIGHT)
                         continue;
@@ -115,12 +123,14 @@ public:
             if (sandtrap.IsEmpty())
                 continue;
 
-            for (uint8_t x = 0; x < sandtrap.width; x += SandtrapSpriteWidth) {
+            for (uint8_t x = 0; x < sandtrap.width; x += SandtrapSpriteWidth)
+            {
                 int16_t drawX = x + sandtrap.x - _cameraX;
                 if (drawX < -(int8_t)SandtrapSpriteWidth || drawX > WIDTH)
                     continue;
 
-                for (uint8_t y = 0; y < sandtrap.height; y += SandtrapSpriteHeight){
+                for (uint8_t y = 0; y < sandtrap.height; y += SandtrapSpriteHeight)
+                {
                     int16_t drawY = y + sandtrap.y - _cameraY;
                     if (drawY < -(int8_t)SandtrapSpriteHeight || drawY > HEIGHT)
                         continue;
@@ -142,12 +152,26 @@ public:
                               wall.p2.y - _cameraY);
         }
 
-        // draw hole
-        _arduboy.drawCircle(map.end.x - _cameraX, map.end.y - _cameraY, Map::HoleRadius);
-
         // cycle sprite frames
         if (_arduboy.everyXFrames(5))
             _treadmillFrame = ++_treadmillFrame % TreadmillUpSpriteFrames;
+    }
+
+    void DrawHole(uint8_t x, uint8_t y, bool withFlag = false)
+    {
+        if (withFlag) {
+            FX::drawBitmap(x - _cameraX + HoleWithFlagXOffset,
+                           y - _cameraY + HoleWithFlagYOffset,
+                           HoleWithFlagSprite, _holeFrame, dbmMasked);
+        }
+        else {
+            FX::drawBitmap(x - _cameraX + HoleNoFlagXOffset,
+                           y - _cameraY + HoleNoFlagYOffset,
+                           HoleNoFlagSprite, _holeFrame, dbmMasked);
+        }
+
+        if (_arduboy.everyXFrames(15))
+            _holeFrame = ++_holeFrame % HoleNoFlagSpriteFrames;
     }
 
     void DrawBall(const Ball &ball)

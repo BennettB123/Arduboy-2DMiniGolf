@@ -6,8 +6,8 @@ using uint24_t = __uint24;
 
 // Initialize FX hardware using  FX::begin(FX_DATA_PAGE); in the setup() function.
 
-constexpr uint16_t FX_DATA_PAGE  = 0xfff8;
-constexpr uint24_t FX_DATA_BYTES = 1940;
+constexpr uint16_t FX_DATA_PAGE  = 0xfff7;
+constexpr uint24_t FX_DATA_BYTES = 2140;
 
 constexpr uint24_t TreadmillUpSprite = 0x000000;
 constexpr uint16_t TreadmillUpSpriteWidth  = 8;
@@ -33,4 +33,14 @@ constexpr uint24_t SandtrapSprite = 0x000110;
 constexpr uint16_t SandtrapSpriteWidth  = 8;
 constexpr uint16_t SandtrapSpriteHeight = 8;
 
-constexpr uint24_t Maps = 0x00011C;
+constexpr uint24_t HoleNoFlagSprite = 0x00011C;
+constexpr uint16_t HoleNoFlagSpriteWidth  = 8;
+constexpr uint16_t HoleNoFlagSpriteHeight = 8;
+constexpr uint8_t  HoleNoFlagSpriteFrames = 4;
+
+constexpr uint24_t HoleWithFlagSprite = 0x000160;
+constexpr uint16_t HoleWithFlagSpriteWidth  = 8;
+constexpr uint16_t HoleWithFlagSpriteHeight = 16;
+constexpr uint8_t  HoleWithFlagSpriteFrames = 4;
+
+constexpr uint24_t Maps = 0x0001E4;
