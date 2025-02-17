@@ -27,6 +27,7 @@ private:
     Camera _camera;
     Ball _ball;
     GameState _gameState;
+    uint8_t _totalPar;
     uint8_t _strokes[MapManager::NumMaps] = {0};
     float _secondsDelta;
     bool _doubleSpeedEnabled;
@@ -38,13 +39,14 @@ public:
 
     void Init()
     {
-        _mapIndex = 0;
+        _mapIndex = 7;
         _map = MapManager::LoadMap(_mapIndex);
         _camera = Camera(_arduboy, 0, 0, _map.width, _map.height);
         _ball = Ball(static_cast<float>(_map.start.x), static_cast<float>(_map.start.y));
         _gameState = GameState::MapSummary;
         _secondsDelta = 0;
         _doubleSpeedEnabled = false;
+        _totalPar = MapManager::GetTotalPar();
 
         for (uint8_t i = 0; i < MapManager::NumMaps; i++)
             _strokes[i] = 0;
@@ -111,7 +113,7 @@ public:
                 _camera.DrawMapComplete(_map, _strokes[_mapIndex]);
                 break;
             case GameState::GameSummary:
-                _camera.DrawGameSummary(_strokes, MapManager::GetTotalPar());
+                _camera.DrawGameSummary(_strokes, _totalPar);
                 break;
         }
     }
