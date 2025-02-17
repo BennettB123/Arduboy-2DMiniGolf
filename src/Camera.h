@@ -211,7 +211,7 @@ public:
             totalStrokes += strokes[i];
 
         _font4x6.setCursorY(12);
-        PrintCenteredWithBackground(String(F("All 18 Holes Completed!\n\n")) +
+        PrintCenteredWithBackground(String(F("All Holes Complete!\n\n")) +
                                     String(F("Final Score\n")) +
                                     String(F("Total Par:     ")) + totalPar + String(F("\n")) +
                                     String(F("Total Strokes: ")) + totalStrokes);
