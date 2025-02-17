@@ -104,7 +104,7 @@ struct Map
     static constexpr uint8_t HoleRadius = 3;
     static constexpr uint8_t MaxNumWalls = 21;
     static constexpr uint8_t MaxNumCircles = 14;
-    static constexpr uint8_t MaxNumSandTraps = 4;
+    static constexpr uint8_t MaxNumSandTraps = 6;
     static constexpr uint8_t MaxNumTreadmills = 5;
 
     uint8_t par;
