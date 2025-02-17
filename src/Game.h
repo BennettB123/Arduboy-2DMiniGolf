@@ -82,33 +82,33 @@ public:
         {
             case GameState::MapSummary:
                 _camera.DrawMap(_map);
-                _camera.DrawBall(_ball);
                 _camera.DrawHole(_map.end.x, _map.end.y, !IsBallNearHole());
+                _camera.DrawBall(_ball);
                 _camera.DrawMapSummary(_map);
                 break;
             case GameState::Aiming:
                 _camera.DrawMap(_map);
-                _camera.DrawBall(_ball);
                 _camera.DrawHole(_map.end.x, _map.end.y, !IsBallNearHole());
+                _camera.DrawBall(_ball);
                 _camera.DrawAimHud(_ball);
                 break;
             case GameState::ChoosingPower:
                 _camera.DrawMap(_map);
-                _camera.DrawBall(_ball);
                 _camera.DrawHole(_map.end.x, _map.end.y, !IsBallNearHole());
+                _camera.DrawBall(_ball);
                 _camera.DrawAimHud(_ball);
                 break;
             case GameState::MapExplorer:
                 _camera.DrawMap(_map);
-                _camera.DrawBall(_ball);
                 _camera.DrawHole(_map.end.x, _map.end.y, !IsBallNearHole());
+                _camera.DrawBall(_ball);
                 _camera.DrawAimHud(_ball);
                 _camera.DrawMapExplorerIndicator();
                 break;
             case GameState::BallInMotion:
                 _camera.DrawMap(_map);
-                _camera.DrawBall(_ball);
                 _camera.DrawHole(_map.end.x, _map.end.y, !IsBallNearHole());
+                _camera.DrawBall(_ball);
                 if (_doubleSpeedEnabled)
                     _camera.DrawDoubleSpeedIndicator();
                 break;

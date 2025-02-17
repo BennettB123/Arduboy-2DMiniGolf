@@ -16,6 +16,7 @@ private:
     uint8_t _mapHeight;
     uint8_t _treadmillFrame = 0;
     uint8_t _holeFrame = 0;
+    bool _borderFlickerToggle = false; // alternate true/false to make the DottedBorder dynamic
     Font4x6 _font4x6;
     bool _textFlashToggle = false;
 
@@ -344,7 +345,8 @@ private:
         // Top border
         for (x = 0; x < rect.width; x++)
         {
-            if ((x % 2 == 1) ^ true)
+            bool draw = (x % 2 == 1) ^ true;
+            if (draw == _borderFlickerToggle)
                 _arduboy.drawPixel(x + rect.x, rect.y);
         }
 
@@ -352,14 +354,16 @@ private:
         for (x = 0; x < rect.width; x++)
         {
             y = rect.height - 1;
-            if ((x % 2 == 1) ^ (y % 2 == 0))
+            bool draw = (x % 2 == 1) ^ (y % 2 == 0);
+            if (draw == _borderFlickerToggle)
                 _arduboy.drawPixel(x + rect.x, y + rect.y);
         }
 
         // Left border
         for (y = 0; y < rect.height; y++)
         {
-            if ((y % 2 == 0) ^ false)
+            bool draw = (y % 2 == 0) ^ false;
+            if (draw == _borderFlickerToggle)
                 _arduboy.drawPixel(rect.x, y + rect.y);
         }
 
@@ -367,9 +371,13 @@ private:
         for (y = 0; y < rect.height; y++)
         {
             x = rect.width - 1;
-            if (x % 2 == 1 ^ y % 2 == 0)
+            bool draw = x % 2 == 1 ^ y % 2 == 0;
+            if (draw == _borderFlickerToggle)
                 _arduboy.drawPixel(x + rect.x, y + rect.y);
         }
+
+        if (_arduboy.everyXFrames(10))
+            _borderFlickerToggle = !_borderFlickerToggle;
     }
 
     // Returns a Rect that represents the boundary of a block of text.
