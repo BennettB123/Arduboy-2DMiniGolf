@@ -195,10 +195,11 @@ public:
                           y - _cameraY);
     }
 
-    void DrawMapSummary(const Map &map)
+    void DrawMapSummary(uint8_t mapNum, const Map &map)
     {
-        _font4x6.setCursor(0, 25);
-        PrintCenteredWithBackground(map.name +
+        _font4x6.setCursor(0, 20);
+        PrintCenteredWithBackground(String(F("Hole ")) + mapNum + String(F("\n")) +
+                                    map.name +
                                     String(F("\npar ")) + String(map.par));
     }
 
@@ -220,13 +221,13 @@ public:
             DrawTextBottomLeft("2x");
     }
 
-    void DrawMapComplete(const Map &map, uint8_t strokes)
+    void DrawMapComplete(uint8_t mapNum, const Map &map, uint8_t strokes)
     {
         _font4x6.setCursorY(10);
-        PrintCenteredWithBackground(String(F("Hole Complete!\n")) +
-                                    String(F("par ")) + map.par +
-                                    String(F("\ntook ")) + String(strokes) + String(F(" strokes\n")) +
-                                    String(F("Press A to continue")));
+        PrintCenteredWithBackground(String(F("Hole ")) + mapNum + F((" Complete!\n")) +
+                                    String(F("par:     ")) + map.par + String(F("\n")) +
+                                    String(F("strokes: ")) + String(strokes) +
+                                    String(F("\nPress A to continue")));
     }
 
     void DrawGameSummary(uint8_t (&strokes)[MapManager::NumMaps], uint8_t totalPar)

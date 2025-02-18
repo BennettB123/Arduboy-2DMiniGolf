@@ -84,7 +84,7 @@ public:
                 _camera.DrawMap(_map);
                 _camera.DrawHole(_map.end.x, _map.end.y, !IsBallNearHole());
                 _camera.DrawBall(_ball);
-                _camera.DrawMapSummary(_map);
+                _camera.DrawMapSummary(_mapIndex + 1, _map);
                 break;
             case GameState::Aiming:
                 _camera.DrawMap(_map);
@@ -116,7 +116,7 @@ public:
                 _camera.DrawMap(_map);
                 _camera.DrawHole(_map.end.x, _map.end.y, !IsBallNearHole());
                 _camera.DrawBall(_ball);
-                _camera.DrawMapComplete(_map, _strokes[_mapIndex]);
+                _camera.DrawMapComplete(_mapIndex + 1, _map, _strokes[_mapIndex]);
                 break;
             case GameState::GameSummary:
                 _camera.DrawGameSummary(_strokes, _totalPar);
