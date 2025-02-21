@@ -21,6 +21,10 @@
 
 #define CHAR_EXCLAMATION 33
 #define CHAR_PERIOD 46
+#define CHAR_DOUBLEQUOTE 34
+#define CHAR_COLON 58
+#define CHAR_GREATERTHAN 62
+
 #define CHAR_LETTER_A 65
 #define CHAR_LETTER_Z 90
 #define CHAR_LETTER_A_LOWER 97
@@ -31,6 +35,10 @@
 #ifdef USE_LOWER_CASE
   #define FONT_EXCLAMATION_INDEX 62
   #define FONT_PERIOD_INDEX 63
+  #define FONT_DOUBLEQUOTE_INDEX 64
+  #define FONT_COLON_INDEX 65
+  #define FONT_GREATERTHAN_INDEX 66
+
   #define FONT_NUMBER_INDEX 52
 #else
   #define FONT_EXCLAMATION_INDEX 36
@@ -427,8 +435,25 @@ const uint8_t PROGMEM font_images[] = {
   0x00,  // ░░░░░░░░
   0x20,  // ░░▓░░░░░
   0x00,  // ░░░░░░░░
-  0x00   // ░░░░░░░░
+  0x00,  // ░░░░░░░░
 
+  // #34 Symbol '"'.
+  0x00,  // ░░░░░░░░
+  0x01,  // ░░░░░░░▓
+  0x00,  // ░░░░░░░░
+  0x01,  // ░░░░░░░▓
+
+  // #58 Symbol ':'.
+  0x00,  // ░░░░░░░░
+  0x24,  // ░░▓░░▓░░
+  0x00,  // ░░░░░░░░
+  0x00,  // ░░░░░░░░
+
+  // #62 Symbol '>'.
+  0x22,  // ░░▓░░░▓░
+  0x14,  // ░░░▓░▓░░
+  0x08,  // ░░░░▓░░░
+  0x00,  // ░░░░░░░░
 };
 
 
@@ -486,6 +511,17 @@ void Font4x6::printChar(const char c, const int8_t x, int8_t y) {
       idx = FONT_PERIOD_INDEX;
       break;
 
+    case CHAR_DOUBLEQUOTE:
+      idx = FONT_DOUBLEQUOTE_INDEX;
+      break;
+
+    case CHAR_COLON:
+      idx = FONT_COLON_INDEX;
+      break;
+
+    case CHAR_GREATERTHAN:
+      idx = FONT_GREATERTHAN_INDEX;
+      break;
   }
 
   if (idx > -1) {
