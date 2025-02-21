@@ -516,7 +516,7 @@ uint8_t Maps = {
         // Map 9 (Quadrants)
     {
         // par, width,  height, start, end
-        3,      160,    160,    8, 8,  80, 80,
+        3,      160,    160,    80, 8,  80, 80,
 
         // empty Map.name (char* is 2 bytes)
         0, 0 
