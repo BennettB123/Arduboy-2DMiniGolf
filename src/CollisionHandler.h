@@ -75,7 +75,7 @@ public:
     static bool BallInHole(Ball &ball, const Map &map)
     {
         float dist = Distance(ball.X, ball.Y, map.end.x, map.end.y);
-        return dist <= Map::HoleRadius - 1;
+        return dist <= Map::HoleRadius - .5;
     }
 
     static float Distance(float x1, float y1, float x2, float y2)
