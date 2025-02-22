@@ -3,12 +3,15 @@
 #include "Ball.h"
 #include "Camera.h"
 #include "CollisionHandler.h"
+#include "Constants.h"
 #include "Map.h"
 #include "MapManager.h"
 #include <Arduboy2.h>
 
 enum class GameState
 {
+    StartScreen,
+    HoleSelection,
     MapSummary,
     Aiming,
     ChoosingPower,
@@ -26,24 +29,26 @@ private:
     Map _map;
     Camera _camera;
     Ball _ball;
-    GameState _gameState;
+    GameState _gameState = GameState::StartScreen;
     uint8_t _totalPar;
     uint8_t _strokes[MapManager::NumMaps] = {0};
     float _secondsDelta;
     bool _doubleSpeedEnabled;
+    uint8_t _startScreenOptionIdx;
+    uint8_t _holeSelectionIdx;
+    bool _singleHoleMode;
 
 public:
     Game(Arduboy2Base arduboy) : _arduboy(arduboy)
     {
     }
 
-    void Init()
+    void Init(uint8_t mapIndex = 0)
     {
-        _mapIndex = 0;
+        _mapIndex = mapIndex;
         _map = MapManager::LoadMap(_mapIndex);
         _camera = Camera(_arduboy, 0, 0, _map.width, _map.height);
         _ball = Ball(static_cast<float>(_map.start.x), static_cast<float>(_map.start.y));
-        _gameState = GameState::MapSummary;
         _secondsDelta = 0;
         _doubleSpeedEnabled = false;
         _totalPar = MapManager::GetTotalPar();
@@ -80,6 +85,12 @@ public:
     {
         switch (_gameState)
         {
+            case GameState::StartScreen:
+                _camera.DrawStartScreen(_startScreenOptionIdx);
+                break;
+            case GameState::HoleSelection:
+                _camera.DrawHoleSelection(_holeSelectionIdx);
+                break;
             case GameState::MapSummary:
                 _camera.DrawMap(_map);
                 _camera.DrawHole(_map.end.x, _map.end.y, !IsBallNearHole());
@@ -129,6 +140,12 @@ private:
     {
         switch (_gameState)
         {
+            case GameState::StartScreen:
+                HandleInputStartScreen();
+                break;
+            case GameState::HoleSelection:
+                HandleInputHoleSelection();
+                break;
             case GameState::MapSummary:
                 HandleInputMapSummary();
                 break;
@@ -150,6 +167,47 @@ private:
             case GameState::GameSummary:
                 HandleInputGameSummary();
                 break;
+        }
+    }
+
+    void HandleInputStartScreen()
+    {
+        if (_arduboy.justPressed(UP_BUTTON))
+            _startScreenOptionIdx = max(0, _startScreenOptionIdx - 1);
+        if (_arduboy.justPressed(DOWN_BUTTON))
+            _startScreenOptionIdx = min(_startScreenOptionIdx + 1, StartScreenNumOptions - 1);
+        if (_arduboy.justPressed(A_BUTTON))
+        {
+            switch (_startScreenOptionIdx)
+            {
+                // Play all holes
+                case (0):
+                    Init();
+                    _gameState = GameState::MapSummary;
+                    break;
+
+                // Select a single hole
+                case (1):
+                    _gameState = GameState::HoleSelection;
+                    break;
+            }
+        }
+    }
+
+    void HandleInputHoleSelection()
+    {
+        if (_arduboy.justPressed(UP_BUTTON))
+            _holeSelectionIdx = max(0, _holeSelectionIdx - 1);
+        if (_arduboy.justPressed(DOWN_BUTTON))
+            _holeSelectionIdx = min(_holeSelectionIdx + 1, MapManager::NumMaps - 1);
+        if (_arduboy.justPressed(A_BUTTON)) {
+            _singleHoleMode = true;
+            Init(_holeSelectionIdx);
+            _gameState = GameState::MapSummary;
+        }
+        if (_arduboy.justPressed(B_BUTTON)) {
+            _holeSelectionIdx = 0;
+            _gameState = GameState::StartScreen;
         }
     }
 
@@ -217,13 +275,15 @@ private:
     {
         if (_arduboy.justPressed(A_BUTTON))
         {
-            if (_mapIndex >= MapManager::NumMaps - 1)
-            {
-                _gameState = GameState::GameSummary;
+            if (_singleHoleMode) {
+                _singleHoleMode = false;
+                _gameState = GameState::HoleSelection;
             }
-            else
-            {
-                LoadNextMap();
+            else {
+                if (_mapIndex >= MapManager::NumMaps - 1)
+                    _gameState = GameState::GameSummary;
+                else
+                    LoadNextMap();
             }
         }
     }
@@ -231,8 +291,10 @@ private:
     void HandleInputGameSummary()
     {
         // for now, just restart the game
-        if (_arduboy.justPressed(A_BUTTON))
+        if (_arduboy.justPressed(A_BUTTON)) {
             Init();
+            _gameState = GameState::StartScreen;
+        }
     }
 
     void TickBallInMotion()

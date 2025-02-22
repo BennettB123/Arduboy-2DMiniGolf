@@ -18,7 +18,7 @@ public:
         FX::readObject(map);
         FX::readEnd();
 
-        map.name = mapNames[index];
+        map.name = MapNames[index];
 
         return map;
     }
@@ -41,11 +41,10 @@ public:
         return total;
     }
 
-private:
-    static const char *mapNames[NumMaps];
+    static const char *MapNames[NumMaps];
 };
 
-const char *MapManager::mapNames[MapManager::NumMaps] = {
+const char *MapManager::MapNames[MapManager::NumMaps] = {
     "Squiggly Lane",
     "Round Rodeo",
     "The Diamond",

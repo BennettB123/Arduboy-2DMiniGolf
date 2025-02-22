@@ -1,9 +1,12 @@
 #pragma once
 
 #include "Ball.h"
+#include "Constants.h"
 #include "Font4x6/Font4x6.h"
 #include "Map.h"
 #include "MapManager.h"
+#include "FX/fxdata.h"
+#include "FX/ArduboyFX.h"
 #include <Arduboy2.h>
 
 class Camera
@@ -31,6 +34,10 @@ private:
     static constexpr int8_t HoleNoFlagYOffset = -3;
     static constexpr int8_t HoleWithFlagXOffset = -4;
     static constexpr int8_t HoleWithFlagYOffset = -11;
+
+    const char *StartMenuTextOptions[StartScreenNumOptions] = {
+        "Play All Holes",
+        "Select Hole"};
 
 public:
     Camera() = default;
@@ -160,12 +167,14 @@ public:
 
     void DrawHole(uint8_t x, uint8_t y, bool withFlag = false)
     {
-        if (withFlag) {
+        if (withFlag)
+        {
             FX::drawBitmap(x - _cameraX + HoleWithFlagXOffset,
                            y - _cameraY + HoleWithFlagYOffset,
                            HoleWithFlagSprite, _holeFrame, dbmMasked);
         }
-        else {
+        else
+        {
             FX::drawBitmap(x - _cameraX + HoleNoFlagXOffset,
                            y - _cameraY + HoleNoFlagYOffset,
                            HoleNoFlagSprite, _holeFrame, dbmMasked);
@@ -195,11 +204,38 @@ public:
                           y - _cameraY);
     }
 
+    void DrawStartScreen(uint8_t optionIdx)
+    {
+        _font4x6.setCursor(0, 0);
+
+        for (uint8_t i = 0; i < StartScreenNumOptions; i++)
+        {
+            if (i == optionIdx)
+                _font4x6.println(String(F(">")) + StartMenuTextOptions[i]);
+            else
+                _font4x6.println(String(F(" ")) + StartMenuTextOptions[i]);
+        }
+    }
+
+    void DrawHoleSelection(uint8_t holeIdx) {
+        _font4x6.setCursor(0, 0);
+        
+        uint8_t holeNum = 1;
+        for (uint8_t i = 0; i < MapManager::NumMaps; i++, holeNum++) {
+            auto holeNumAndName = holeNum + String(F(": "))+ MapManager::MapNames[i];
+
+            if (i == holeIdx)
+                _font4x6.println(String(F(">")) + holeNumAndName);
+            else
+                _font4x6.println(String(F(" ")) + holeNumAndName);
+        }
+    }
+
     void DrawMapSummary(uint8_t mapNum, const Map &map)
     {
         _font4x6.setCursor(0, 20);
         PrintCenteredWithBackground(String(F("Hole ")) + mapNum + String(F("\n")) +
-                                    map.name +
+                                    F("\"") + map.name + F("\"") +
                                     String(F("\npar ")) + String(map.par));
     }
 
