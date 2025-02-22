@@ -18,6 +18,8 @@ private:
     uint8_t _mapWidth;
     uint8_t _mapHeight;
     uint8_t _treadmillFrame = 0;
+    uint8_t _startScreenFlagWaveFrame = 0;
+    int8_t _startScreenFlagWaveFrameIncreasing = 1; // used to increment/decrement sprite frame (ex: 0,1,2,3,2,1,0...)
     uint8_t _holeFrame = 0;
     bool _borderFlickerToggle = false; // alternate true/false to make the DottedBorder dynamic
     Font4x6 _font4x6;
@@ -215,10 +217,12 @@ public:
             else
                 _font4x6.println(String(F(" ")) + StartMenuTextOptions[i]);
         }
+
+        DrawMenuBackgroundAnimation();
     }
 
     void DrawHoleSelection(uint8_t holeIdx) {
-        uint8_t baseHeight = 30;
+        uint8_t baseHeight = 0;
         _font4x6.setCursor(0, baseHeight - ((FontHeight + 1) * holeIdx));
         
         uint8_t holeNum = 1;
@@ -229,6 +233,24 @@ public:
                 _font4x6.println(String(F(">")) + holeNumAndName);
             else
                 _font4x6.println(String(F(" ")) + holeNumAndName);
+        }
+
+        DrawMenuBackgroundAnimation();
+    }
+
+    void DrawMenuBackgroundAnimation()
+    {
+        // draw ground and flag pole
+        FX::drawBitmap(0, 0, StartScreenGroundAndPoleSprite, 0, dbmMasked);
+        FX::drawBitmap(100, 11, StartScreenFlagWaveSprite, _startScreenFlagWaveFrame, dbmNormal);
+
+        if (_arduboy.everyXFrames(8)) {
+            // iterate forward/backward through dog tail wag frames
+            _startScreenFlagWaveFrame += _startScreenFlagWaveFrameIncreasing;
+            if (_startScreenFlagWaveFrame >= StartScreenFlagWaveSpriteFrames - 1)
+                _startScreenFlagWaveFrameIncreasing = -1;
+            else if (_startScreenFlagWaveFrame <= 0)
+                _startScreenFlagWaveFrameIncreasing = 1;
         }
     }
 

@@ -7,6 +7,8 @@ image_t TreadmillRightSprite = "../Assets/TreadmillRight_8x8.png"
 image_t SandtrapSprite = "../Assets/Sandtrap.png"
 image_t HoleNoFlagSprite = "../Assets/HoleNoFlag_8x8.png"
 image_t HoleWithFlagSprite = "../Assets/HoleWithFlag_8x16.png"
+image_t StartScreenGroundAndPoleSprite = "../Assets/StartScreenGroundAndPole.png"
+image_t StartScreenFlagWaveSprite = "../Assets/StartScreenFlagWave_18x12.png"
 
 uint8_t Maps = {
     // Map 1 (Squiggly Lane)
