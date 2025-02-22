@@ -218,7 +218,8 @@ public:
     }
 
     void DrawHoleSelection(uint8_t holeIdx) {
-        _font4x6.setCursor(0, 0);
+        uint8_t baseHeight = 30;
+        _font4x6.setCursor(0, baseHeight - ((FontHeight + 1) * holeIdx));
         
         uint8_t holeNum = 1;
         for (uint8_t i = 0; i < MapManager::NumMaps; i++, holeNum++) {
