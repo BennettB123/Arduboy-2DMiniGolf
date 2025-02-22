@@ -222,8 +222,16 @@ public:
     }
 
     void DrawHoleSelection(uint8_t holeIdx) {
+        // scroll lines as holeIdx changes
         uint8_t baseHeight = 0;
-        _font4x6.setCursor(0, baseHeight - ((FontHeight + 1) * holeIdx));
+        uint8_t height = baseHeight - ((FontHeight + 1) * holeIdx);
+        
+        // stop scrolling if we're towards the end of the list
+        uint8_t numEntriesFitOnScreen = 5;
+        if (holeIdx >= MapManager::NumMaps - numEntriesFitOnScreen)
+            height = baseHeight - (FontHeight + 1) * (MapManager::NumMaps - numEntriesFitOnScreen);
+
+        _font4x6.setCursor(0, height);
         
         uint8_t holeNum = 1;
         for (uint8_t i = 0; i < MapManager::NumMaps; i++, holeNum++) {
