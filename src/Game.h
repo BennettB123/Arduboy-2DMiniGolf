@@ -12,6 +12,7 @@ enum class GameState
 {
     StartScreen,
     HoleSelection,
+    Instructions,
     MapSummary,
     Aiming,
     ChoosingPower,
@@ -37,6 +38,7 @@ private:
     uint8_t _startScreenOptionIdx;
     uint8_t _holeSelectionIdx;
     bool _singleHoleMode;
+    uint8_t _instructionsPageIdx;
 
 public:
     Game(Arduboy2Base arduboy) : _arduboy(arduboy)
@@ -90,6 +92,9 @@ public:
                 break;
             case GameState::HoleSelection:
                 _camera.DrawHoleSelection(_holeSelectionIdx);
+                break;
+            case GameState::Instructions:
+                _camera.DrawInstructions(_instructionsPageIdx);
                 break;
             case GameState::MapSummary:
                 _camera.DrawMap(_map);
@@ -146,6 +151,9 @@ private:
             case GameState::HoleSelection:
                 HandleInputHoleSelection();
                 break;
+            case GameState::Instructions:
+                HandleInputInstructions();
+                break;
             case GameState::MapSummary:
                 HandleInputMapSummary();
                 break;
@@ -190,6 +198,11 @@ private:
                 case (1):
                     _gameState = GameState::HoleSelection;
                     break;
+
+                // Instructions
+                case (2):
+                    _gameState = GameState::Instructions;
+                    break;
             }
         }
     }
@@ -200,14 +213,33 @@ private:
             _holeSelectionIdx = max(0, _holeSelectionIdx - 1);
         if (_arduboy.justPressed(DOWN_BUTTON))
             _holeSelectionIdx = min(_holeSelectionIdx + 1, MapManager::NumMaps - 1);
-        if (_arduboy.justPressed(A_BUTTON)) {
+        if (_arduboy.justPressed(A_BUTTON))
+        {
             _singleHoleMode = true;
             Init(_holeSelectionIdx);
             _gameState = GameState::MapSummary;
         }
-        if (_arduboy.justPressed(B_BUTTON)) {
+        if (_arduboy.justPressed(B_BUTTON))
+        {
             _holeSelectionIdx = 0;
             _gameState = GameState::StartScreen;
+        }
+    }
+
+    void HandleInputInstructions()
+    {
+        if (_arduboy.justPressed(B_BUTTON))
+        {
+            _instructionsPageIdx = 0;
+            _gameState = GameState::StartScreen;
+        }
+        if (_arduboy.justPressed(LEFT_BUTTON) && _instructionsPageIdx > 0)
+        {
+            --_instructionsPageIdx;
+        }
+        if (_arduboy.justPressed(RIGHT_BUTTON) && _instructionsPageIdx < InstructionsSpriteFrames - 1)
+        {
+            ++_instructionsPageIdx;
         }
     }
 
@@ -275,11 +307,13 @@ private:
     {
         if (_arduboy.justPressed(A_BUTTON))
         {
-            if (_singleHoleMode) {
+            if (_singleHoleMode)
+            {
                 _singleHoleMode = false;
                 _gameState = GameState::HoleSelection;
             }
-            else {
+            else
+            {
                 if (_mapIndex >= MapManager::NumMaps - 1)
                     _gameState = GameState::GameSummary;
                 else
@@ -291,7 +325,8 @@ private:
     void HandleInputGameSummary()
     {
         // for now, just restart the game
-        if (_arduboy.justPressed(A_BUTTON)) {
+        if (_arduboy.justPressed(A_BUTTON))
+        {
             Init();
             _gameState = GameState::StartScreen;
         }

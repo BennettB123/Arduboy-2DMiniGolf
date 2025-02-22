@@ -2,11 +2,11 @@
 
 #include "Ball.h"
 #include "Constants.h"
+#include "FX/ArduboyFX.h"
+#include "FX/fxdata.h"
 #include "Font4x6/Font4x6.h"
 #include "Map.h"
 #include "MapManager.h"
-#include "FX/fxdata.h"
-#include "FX/ArduboyFX.h"
 #include <Arduboy2.h>
 
 class Camera
@@ -39,7 +39,8 @@ private:
 
     const char *StartMenuTextOptions[StartScreenNumOptions] = {
         "Play All Holes",
-        "Select Hole"};
+        "Select Hole",
+        "Instructions"};
 
 public:
     Camera() = default;
@@ -221,21 +222,23 @@ public:
         DrawMenuBackgroundAnimation();
     }
 
-    void DrawHoleSelection(uint8_t holeIdx) {
+    void DrawHoleSelection(uint8_t holeIdx)
+    {
         // scroll lines as holeIdx changes
         uint8_t baseHeight = 0;
         uint8_t height = baseHeight - ((FontHeight + 1) * holeIdx);
-        
+
         // stop scrolling if we're towards the end of the list
         uint8_t numEntriesFitOnScreen = 5;
         if (holeIdx >= MapManager::NumMaps - numEntriesFitOnScreen)
             height = baseHeight - (FontHeight + 1) * (MapManager::NumMaps - numEntriesFitOnScreen);
 
         _font4x6.setCursor(0, height);
-        
+
         uint8_t holeNum = 1;
-        for (uint8_t i = 0; i < MapManager::NumMaps; i++, holeNum++) {
-            auto holeNumAndName = holeNum + String(F(": "))+ MapManager::MapNames[i];
+        for (uint8_t i = 0; i < MapManager::NumMaps; i++, holeNum++)
+        {
+            auto holeNumAndName = holeNum + String(F(": ")) + MapManager::MapNames[i];
 
             if (i == holeIdx)
                 _font4x6.println(String(F(">")) + holeNumAndName);
@@ -246,13 +249,37 @@ public:
         DrawMenuBackgroundAnimation();
     }
 
+    void DrawInstructions(uint8_t pageIdx)
+    {
+        FX::drawBitmap(0, 0, InstructionsSprite, pageIdx, dbmNormal);
+
+        // draw indicator 'arrows' for changing pages
+        if (_textFlashToggle)
+        {
+            if (pageIdx > 0)
+            {
+                _font4x6.setCursor(0, HEIGHT - FontHeight);
+                _font4x6.print("<");
+            }
+            if (pageIdx < InstructionsSpriteFrames - 1)
+            {
+                _font4x6.setCursor(WIDTH - FontWidth, HEIGHT - FontHeight);
+                _font4x6.print(">");
+            }
+        }
+
+        if (_arduboy.everyXFrames(45))
+            _textFlashToggle = !_textFlashToggle;
+    }
+
     void DrawMenuBackgroundAnimation()
     {
         // draw ground and flag pole
         FX::drawBitmap(0, 0, StartScreenGroundAndPoleSprite, 0, dbmMasked);
         FX::drawBitmap(100, 11, StartScreenFlagWaveSprite, _startScreenFlagWaveFrame, dbmNormal);
 
-        if (_arduboy.everyXFrames(8)) {
+        if (_arduboy.everyXFrames(8))
+        {
             // iterate forward/backward through dog tail wag frames
             _startScreenFlagWaveFrame += _startScreenFlagWaveFrameIncreasing;
             if (_startScreenFlagWaveFrame >= StartScreenFlagWaveSpriteFrames - 1)
