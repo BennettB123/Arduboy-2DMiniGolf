@@ -388,7 +388,7 @@ private:
 
         Rect borderRect = ExpandRect(bgRect, 1);
 
-        DrawDottedBorder(borderRect);
+        DrawDottedBorderNoFlicker(borderRect);
         _arduboy.fillRect(bgRect.x, bgRect.y, bgRect.width, bgRect.height, BLACK);
         _font4x6.print(text);
     }
@@ -473,6 +473,12 @@ private:
 
         if (_arduboy.everyXFrames(10))
             _borderFlickerToggle = !_borderFlickerToggle;
+    }
+
+    void DrawDottedBorderNoFlicker(const Rect &rect)
+    {
+        _borderFlickerToggle = false;
+        DrawDottedBorder(rect);
     }
 
     // Returns a Rect that represents the boundary of a block of text.
