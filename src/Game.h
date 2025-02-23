@@ -17,6 +17,7 @@ enum class GameState
     Aiming,
     ChoosingPower,
     MapExplorer,
+    InGameMenu,
     BallInMotion,
     MapComplete,
     GameSummary,
@@ -31,6 +32,7 @@ private:
     Camera _camera;
     Ball _ball;
     GameState _gameState = GameState::StartScreen;
+    GameState _gameStateBeforePause = GameState::StartScreen;
     uint8_t _totalPar;
     uint8_t _strokes[MapManager::NumMaps] = {0};
     float _secondsDelta;
@@ -39,6 +41,10 @@ private:
     uint8_t _holeSelectionIdx;
     bool _singleHoleMode;
     uint8_t _instructionsPageIdx;
+    float _pauseButtonHeldSeconds;
+    bool _bButtonPressStartedDuringAim;
+
+    const static float _pauseButtonHoldPauseTime = 0.5;
 
 public:
     Game(Arduboy2Base arduboy) : _arduboy(arduboy)
@@ -121,6 +127,9 @@ public:
                 _camera.DrawAimHud(_ball);
                 _camera.DrawMapExplorerIndicator();
                 break;
+            case GameState::InGameMenu:
+                _camera.DrawInGameMenu();
+                break;
             case GameState::BallInMotion:
                 _camera.DrawMap(_map);
                 _camera.DrawHole(_map.end.x, _map.end.y, !IsBallNearHole());
@@ -143,6 +152,23 @@ public:
 private:
     void HandleInput()
     {
+        // check for pauses
+        if (InPausableMode())
+        {
+            if (_arduboy.pressed(B_BUTTON))
+            {
+                _pauseButtonHeldSeconds += _secondsDelta;
+                if (_pauseButtonHeldSeconds > _pauseButtonHoldPauseTime)
+                {
+                    _pauseButtonHeldSeconds = 0;
+                    _gameStateBeforePause = _gameState;
+                    _gameState = GameState::InGameMenu;
+                }
+            }
+            else
+                _pauseButtonHeldSeconds = 0;
+        }
+
         switch (_gameState)
         {
             case GameState::StartScreen:
@@ -165,6 +191,9 @@ private:
                 break;
             case GameState::MapExplorer:
                 HandleInputMapExplorer();
+                break;
+            case GameState::InGameMenu:
+                HandleInputInGameMenu();
                 break;
             case GameState::BallInMotion:
                 HandleInputBallInMotion();
@@ -245,20 +274,27 @@ private:
 
     void HandleInputMapSummary()
     {
-        if (AnyButtonPressed(_arduboy))
+        if (AnyButtonPressed(_arduboy)) {
             _gameState = GameState::Aiming;
+            _bButtonPressStartedDuringAim = false;
+        }
     }
 
     void HandleInputAiming()
     {
-        if (_arduboy.justPressed(B_BUTTON))
-            _gameState = GameState::MapExplorer;
         if (_arduboy.justPressed(A_BUTTON))
             _gameState = GameState::ChoosingPower;
         if (_arduboy.pressed(LEFT_BUTTON))
             _ball.RotateDirectionCounterClockwise(_secondsDelta);
         if (_arduboy.pressed(RIGHT_BUTTON))
             _ball.RotateDirectionClockwise(_secondsDelta);
+
+        
+        if (_arduboy.justPressed(B_BUTTON))
+            _bButtonPressStartedDuringAim = true;
+        // maybe have a boolean that ensures the release was started in this mode
+        if (_arduboy.justReleased(B_BUTTON) && _bButtonPressStartedDuringAim) // fix this activating when exiting menu
+            _gameState = GameState::MapExplorer;
     }
 
     void HandleInputChoosingPower()
@@ -266,6 +302,7 @@ private:
         if (_arduboy.justPressed(B_BUTTON))
         {
             _gameState = GameState::Aiming;
+            _bButtonPressStartedDuringAim = false;
             return;
         }
         if (_arduboy.justPressed(A_BUTTON))
@@ -287,10 +324,19 @@ private:
             _camera.MoveLeft();
         if (_arduboy.pressed(RIGHT_BUTTON))
             _camera.MoveRight();
-        if (_arduboy.justPressed(B_BUTTON))
+        if (_arduboy.justReleased(B_BUTTON))
         {
             _gameState = GameState::Aiming;
+            _bButtonPressStartedDuringAim = false;
             _camera.FocusOn(_ball.X, _ball.Y);
+        }
+    }
+
+    void HandleInputInGameMenu()
+    {
+        if (_arduboy.justPressed(B_BUTTON)) {
+            _gameState = _gameStateBeforePause;
+            _bButtonPressStartedDuringAim = false;
         }
     }
 
@@ -346,6 +392,7 @@ private:
             if (_ball.IsStopped())
             {
                 _gameState = GameState::Aiming;
+                _bButtonPressStartedDuringAim = false;
                 _ball.ResetPower();
                 _doubleSpeedEnabled = false;
                 break;
@@ -378,6 +425,14 @@ private:
     bool IsBallNearHole()
     {
         return CollisionHandler::Distance(_ball.X, _ball.Y, _map.end.x, _map.end.y) <= 25;
+    }
+
+    bool InPausableMode()
+    {
+        return _gameState == GameState::Aiming ||
+               _gameState == GameState::ChoosingPower ||
+               _gameState == GameState::MapExplorer ||
+               _gameState == GameState::BallInMotion;
     }
 
     static bool AnyButtonPressed(Arduboy2Base arduboy)

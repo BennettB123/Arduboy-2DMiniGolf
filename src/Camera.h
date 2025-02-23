@@ -306,6 +306,12 @@ public:
             DrawTextBottomLeft("View Map");
     }
 
+    void DrawInGameMenu()
+    {
+        _font4x6.setCursorY(28);
+        PrintCenteredWithBackground(F(("Paused")));
+    }
+
     void DrawDoubleSpeedIndicator()
     {
         if (_arduboy.everyXFrames(30))
