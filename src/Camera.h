@@ -42,6 +42,10 @@ private:
         "Select Hole",
         "Instructions"};
 
+    const char *PauseMenuTextOptions[StartScreenNumOptions] = {
+        "Resume",
+        "Exit to main menu"};
+
 public:
     Camera() = default;
     Camera(Arduboy2Base arduboy, uint8_t x, uint8_t y, uint8_t mapWidth, uint8_t mapHeight)
@@ -306,10 +310,32 @@ public:
             DrawTextBottomLeft("View Map");
     }
 
-    void DrawInGameMenu()
+    void DrawPauseMenu(uint8_t mapNum, const Map &map, uint8_t strokes, uint8_t optionIdx)
     {
-        _font4x6.setCursorY(28);
-        PrintCenteredWithBackground(F(("Paused")));
+        // print "Paused" in top left corner with a border
+        auto pausedText = "Paused";
+        _font4x6.setCursor(2, 1);
+        Rect bgRect = Rect(1, 1, GetTextPixelWidth(pausedText) + 2, FontHeight + 1);
+        Rect borderRect = ExpandRect(bgRect, 1);
+        DrawDottedBorder(borderRect);
+        _arduboy.fillRect(bgRect.x, bgRect.y, bgRect.width, bgRect.height, BLACK);
+        _font4x6.print(pausedText);
+
+        // map info summary
+        _font4x6.setCursor(72, 0);
+        _font4x6.println(String(F("  Hole ")) + mapNum);
+        _font4x6.println(String(F("par:     ")) + map.par);
+        _font4x6.println(String(F("strokes: ")) + strokes);
+
+        // menu options
+        _font4x6.setCursor(0, 36);
+        for (uint8_t i = 0; i < PauseScreenNumOptions; i++)
+        {
+            if (i == optionIdx)
+                _font4x6.println(String(F(">")) + PauseMenuTextOptions[i]);
+            else
+                _font4x6.println(String(F(" ")) + PauseMenuTextOptions[i]);
+        }
     }
 
     void DrawDoubleSpeedIndicator()

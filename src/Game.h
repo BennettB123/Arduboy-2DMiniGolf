@@ -17,7 +17,7 @@ enum class GameState
     Aiming,
     ChoosingPower,
     MapExplorer,
-    InGameMenu,
+    PauseMenu,
     BallInMotion,
     MapComplete,
     GameSummary,
@@ -42,7 +42,8 @@ private:
     bool _singleHoleMode;
     uint8_t _instructionsPageIdx;
     float _pauseButtonHeldSeconds;
-    bool _bButtonPressStartedDuringAim;
+    bool _BButtonPressStartedDuringAim;
+    uint8_t _pauseOptionIdx;
 
     const static float _pauseButtonHoldPauseTime = 0.5;
 
@@ -60,6 +61,7 @@ public:
         _secondsDelta = 0;
         _doubleSpeedEnabled = false;
         _totalPar = MapManager::GetTotalPar();
+        _pauseOptionIdx = 0;
 
         for (uint8_t i = 0; i < MapManager::NumMaps; i++)
             _strokes[i] = 0;
@@ -127,8 +129,8 @@ public:
                 _camera.DrawAimHud(_ball);
                 _camera.DrawMapExplorerIndicator();
                 break;
-            case GameState::InGameMenu:
-                _camera.DrawInGameMenu();
+            case GameState::PauseMenu:
+                _camera.DrawPauseMenu(_mapIndex + 1, _map, _strokes[_mapIndex], _pauseOptionIdx);
                 break;
             case GameState::BallInMotion:
                 _camera.DrawMap(_map);
@@ -162,7 +164,7 @@ private:
                 {
                     _pauseButtonHeldSeconds = 0;
                     _gameStateBeforePause = _gameState;
-                    _gameState = GameState::InGameMenu;
+                    _gameState = GameState::PauseMenu;
                 }
             }
             else
@@ -192,8 +194,8 @@ private:
             case GameState::MapExplorer:
                 HandleInputMapExplorer();
                 break;
-            case GameState::InGameMenu:
-                HandleInputInGameMenu();
+            case GameState::PauseMenu:
+                HandleInputPauseMenu();
                 break;
             case GameState::BallInMotion:
                 HandleInputBallInMotion();
@@ -276,7 +278,7 @@ private:
     {
         if (AnyButtonPressed(_arduboy)) {
             _gameState = GameState::Aiming;
-            _bButtonPressStartedDuringAim = false;
+            _BButtonPressStartedDuringAim = false;
         }
     }
 
@@ -291,9 +293,9 @@ private:
 
         
         if (_arduboy.justPressed(B_BUTTON))
-            _bButtonPressStartedDuringAim = true;
+            _BButtonPressStartedDuringAim = true;
         // maybe have a boolean that ensures the release was started in this mode
-        if (_arduboy.justReleased(B_BUTTON) && _bButtonPressStartedDuringAim) // fix this activating when exiting menu
+        if (_arduboy.justReleased(B_BUTTON) && _BButtonPressStartedDuringAim) // fix this activating when exiting menu
             _gameState = GameState::MapExplorer;
     }
 
@@ -302,7 +304,7 @@ private:
         if (_arduboy.justPressed(B_BUTTON))
         {
             _gameState = GameState::Aiming;
-            _bButtonPressStartedDuringAim = false;
+            _BButtonPressStartedDuringAim = false;
             return;
         }
         if (_arduboy.justPressed(A_BUTTON))
@@ -327,16 +329,40 @@ private:
         if (_arduboy.justReleased(B_BUTTON))
         {
             _gameState = GameState::Aiming;
-            _bButtonPressStartedDuringAim = false;
+            _BButtonPressStartedDuringAim = false;
             _camera.FocusOn(_ball.X, _ball.Y);
         }
     }
 
-    void HandleInputInGameMenu()
+    void HandleInputPauseMenu()
     {
         if (_arduboy.justPressed(B_BUTTON)) {
             _gameState = _gameStateBeforePause;
-            _bButtonPressStartedDuringAim = false;
+            _pauseOptionIdx = 0;
+            _BButtonPressStartedDuringAim = false;
+        }
+
+        if (_arduboy.justPressed(UP_BUTTON))
+            _pauseOptionIdx = max(0, _pauseOptionIdx - 1);
+        if (_arduboy.justPressed(DOWN_BUTTON))
+            _pauseOptionIdx = min(_pauseOptionIdx + 1, PauseScreenNumOptions - 1);
+        if (_arduboy.justPressed(A_BUTTON))
+        {
+            switch (_pauseOptionIdx)
+            {
+                // back
+                case (0):
+                    _gameState = _gameStateBeforePause;
+                    _pauseOptionIdx = 0;
+                    _BButtonPressStartedDuringAim = false;
+                    break;
+
+                // main menu 
+                case (1):
+                    Init();
+                    _gameState = GameState::StartScreen;
+                    break;
+            }
         }
     }
 
@@ -392,7 +418,7 @@ private:
             if (_ball.IsStopped())
             {
                 _gameState = GameState::Aiming;
-                _bButtonPressStartedDuringAim = false;
+                _BButtonPressStartedDuringAim = false;
                 _ball.ResetPower();
                 _doubleSpeedEnabled = false;
                 break;
