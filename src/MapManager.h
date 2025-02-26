@@ -46,9 +46,9 @@ public:
 
 const char *MapManager::MapNames[MapManager::NumMaps] = {
     "Squiggly Lane",
-    "Round Rodeo",
+    "Solar System",
     "The Diamond",
-    "Treadmill Alley",
+    "Treadmill Twist",
     "Haunted Hallway",
     "Options",
     "Plinko",
