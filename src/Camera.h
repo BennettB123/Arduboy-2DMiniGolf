@@ -128,7 +128,8 @@ public:
                 drawY + circle.radius < 0 || drawY - circle.radius > HEIGHT)
                 continue;
 
-            _arduboy.fillCircle(drawX, drawY, circle.radius);
+            _arduboy.fillCircle(drawX, drawY, circle.radius, BLACK);
+            _arduboy.drawCircle(drawX, drawY, circle.radius, WHITE);
         }
 
         // draw sand traps
