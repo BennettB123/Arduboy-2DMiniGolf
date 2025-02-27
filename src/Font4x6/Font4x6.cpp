@@ -25,6 +25,8 @@
 #define CHAR_COLON 58
 #define CHAR_GREATERTHAN 62
 #define CHAR_LESSTHAN  60
+#define CHAR_PLUS  43
+#define CHAR_MINUS  45
 
 #define CHAR_LETTER_A 65
 #define CHAR_LETTER_Z 90
@@ -40,6 +42,8 @@
   #define FONT_COLON_INDEX 65
   #define FONT_GREATERTHAN_INDEX 66
   #define FONT_LESSTHAN_INDEX 67
+  #define FONT_PLUS_INDEX 68
+  #define FONT_MINUS_INDEX 69
 
   #define FONT_NUMBER_INDEX 52
 #else
@@ -462,6 +466,18 @@ const uint8_t PROGMEM font_images[] = {
   0x14,  // ░░░▓░▓░░
   0x22,  // ░░▓░░░▓░
   0x00,  // ░░░░░░░░
+
+  // #43 Symbol '+'.
+  0x08,  // ░░░░▓░░░
+  0x1C,  // ░░░▓▓▓░░
+  0x08,  // ░░░░▓░░░
+  0x00,  // ░░░░░░░░
+
+  // #45 Symbol '-'.
+  0x08,  // ░░░░▓░░░
+  0x08,  // ░░░░▓░░░
+  0x08,  // ░░░░▓░░░
+  0x00,  // ░░░░░░░░
 };
 
 
@@ -533,6 +549,14 @@ void Font4x6::printChar(const char c, const int8_t x, int8_t y) {
 
     case CHAR_LESSTHAN:
       idx = FONT_LESSTHAN_INDEX;
+      break;
+
+    case CHAR_PLUS:
+      idx = FONT_PLUS_INDEX;
+      break;
+
+    case CHAR_MINUS:
+      idx = FONT_MINUS_INDEX;
       break;
   }
 

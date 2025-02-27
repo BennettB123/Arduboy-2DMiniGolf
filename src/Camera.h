@@ -323,13 +323,13 @@ public:
         _font4x6.print(pausedText);
 
         // map info summary
-        _font4x6.setCursor(72, 0);
-        _font4x6.println(String(F("  Hole ")) + mapNum);
-        _font4x6.println(String(F("par:     ")) + map.par);
-        _font4x6.println(String(F("strokes: ")) + strokes);
+        _font4x6.setCursor(64, 0);
+        _font4x6.println(String(F("   Hole ")) + mapNum);
+        _font4x6.println(String(F("par:      ")) + map.par);
+        _font4x6.println(String(F("strokes:  ")) + strokes);
 
         // menu options
-        _font4x6.setCursor(0, 36);
+        _font4x6.setCursor(0, 48);
         for (uint8_t i = 0; i < PauseScreenNumOptions; i++)
         {
             if (i == optionIdx)
@@ -348,7 +348,21 @@ public:
             DrawTextBottomLeft("2x");
     }
 
-    void DrawMapComplete(uint8_t mapNum, const Map &map, uint8_t strokes)
+    void DrawMapComplete(uint8_t mapNum, const Map &map, uint8_t strokes, int8_t totalOverUnder)
+    {
+        String gameTotal = String(F("game total: ")) + totalOverUnder;
+        if (totalOverUnder > 0)
+            gameTotal += "+";
+
+        _font4x6.setCursorY(8);
+        PrintCenteredWithBackground(String(F("Hole ")) + mapNum + F((" Complete!\n")) +
+                                    String(F("par:     ")) + map.par + String(F("\n")) +
+                                    String(F("strokes: ")) + String(strokes) + String(F("\n\n")) +
+                                    gameTotal +
+                                    String(F("\nPress A to continue")));
+    }
+
+    void DrawMapCompleteNoTotal(uint8_t mapNum, const Map &map, uint8_t strokes)
     {
         _font4x6.setCursorY(10);
         PrintCenteredWithBackground(String(F("Hole ")) + mapNum + F((" Complete!\n")) +
@@ -357,17 +371,20 @@ public:
                                     String(F("\nPress A to continue")));
     }
 
-    void DrawGameSummary(uint8_t (&strokes)[MapManager::NumMaps], uint8_t totalPar)
+    void DrawGameSummary(uint16_t totalStrokes, uint8_t totalPar)
     {
-        uint16_t totalStrokes = 0;
-        for (uint8_t i = 0; i < MapManager::NumMaps; i++)
-            totalStrokes += strokes[i];
+        int8_t totalOverUnder = totalStrokes - totalPar;
 
-        _font4x6.setCursorY(12);
+        String gameTotal = String(F("Total:   ")) + totalOverUnder;
+        if (totalOverUnder > 0)
+            gameTotal += "+";
+
+        _font4x6.setCursorY(7);
         PrintCenteredWithBackground(String(F("All Holes Complete!\n\n")) +
                                     String(F("Final Score\n")) +
-                                    String(F("Total Par:     ")) + totalPar + String(F("\n")) +
-                                    String(F("Total Strokes: ")) + totalStrokes);
+                                    String(F("Par:     ")) + totalPar + String(F("\n")) +
+                                    String(F("Strokes: ")) + totalStrokes + String(F("\n")) +
+                                    gameTotal);
     }
 
     void MoveUp()

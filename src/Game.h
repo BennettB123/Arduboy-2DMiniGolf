@@ -35,6 +35,7 @@ private:
     GameState _gameStateBeforePause = GameState::StartScreen;
     uint8_t _totalPar;
     uint8_t _strokes[MapManager::NumMaps] = {0};
+    int8_t _totalOverUnder = 0;
     float _secondsDelta;
     bool _doubleSpeedEnabled;
     uint8_t _startScreenOptionIdx;
@@ -62,6 +63,7 @@ public:
         _doubleSpeedEnabled = false;
         _totalPar = MapManager::GetTotalPar();
         _pauseOptionIdx = 0;
+        _totalOverUnder = 0;
 
         for (uint8_t i = 0; i < MapManager::NumMaps; i++)
             _strokes[i] = 0;
@@ -143,10 +145,16 @@ public:
                 _camera.DrawMap(_map);
                 _camera.DrawHole(_map.end.x, _map.end.y, !IsBallNearHole());
                 _camera.DrawBall(_ball);
-                _camera.DrawMapComplete(_mapIndex + 1, _map, _strokes[_mapIndex]);
+                if (_singleHoleMode)
+                    _camera.DrawMapCompleteNoTotal(_mapIndex + 1, _map, _strokes[_mapIndex]);
+                else
+                    _camera.DrawMapComplete(_mapIndex + 1, _map, _strokes[_mapIndex], _totalOverUnder);
                 break;
             case GameState::GameSummary:
-                _camera.DrawGameSummary(_strokes, _totalPar);
+                uint16_t totalStrokes = 0;
+                for (uint8_t i = 0; i < MapManager::NumMaps; i++)
+                    totalStrokes += _strokes[i];
+                _camera.DrawGameSummary(totalStrokes, _totalPar);
                 break;
         }
     }
@@ -382,6 +390,7 @@ private:
             if (_singleHoleMode)
             {
                 _singleHoleMode = false;
+                _totalOverUnder = 0;
                 _gameState = GameState::HoleSelection;
             }
             else
@@ -409,11 +418,11 @@ private:
         // do a couple collision checks per tick
         //  (less likely to miss a collision at high speeds)
         uint8_t numCollisionChecks = 2;
-        float updatedDelta = _secondsDelta / numCollisionChecks;
+        float splitDelta = _secondsDelta / numCollisionChecks;
 
         for (uint8_t i = 0; i < numCollisionChecks; i++)
         {
-            _ball.Move(updatedDelta);
+            _ball.Move(splitDelta);
 
             if (_ball.IsStopped())
             {
@@ -424,7 +433,7 @@ private:
                 break;
             }
 
-            CollisionHandler::HandleAllCollisions(_ball, _map, updatedDelta);
+            CollisionHandler::HandleAllCollisions(_ball, _map, splitDelta);
 
             if (CollisionHandler::BallInHole(_ball, _map))
             {
@@ -432,6 +441,7 @@ private:
                 _ball.Y = _map.end.y;
                 _ball.Velocity = {0, 0};
                 _gameState = GameState::MapComplete;
+                _totalOverUnder += _strokes[_mapIndex] - _map.par;
                 break;
             }
         }
