@@ -1,6 +1,7 @@
 #include "src/FX/ArduboyFX.h"
 #include "src/FX/fxdata.h"
 #include "src/Game.h"
+#include "src/CreditsSprite.h"
 #include <Arduboy2.h>
 
 Arduboy2Base arduboy;
@@ -17,6 +18,8 @@ void setup()
     previousTime = millis();
 
     game.Init();
+
+    PlayCreditsAnimation(arduboy);
 }
 
 void loop()
