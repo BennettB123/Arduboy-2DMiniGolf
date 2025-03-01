@@ -19,7 +19,7 @@ void PlayCreditsAnimation(Arduboy2Base arduboy)
 
     auto displayCreditsSprite = [&]()
     {
-        while (!arduboy.nextFrameDEV());
+        while (!arduboy.nextFrame());
 
         arduboy.pollButtons();
         arduboy.clear();

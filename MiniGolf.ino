@@ -24,7 +24,7 @@ void setup()
 
 void loop()
 {
-    while (!arduboy.nextFrameDEV())
+    while (!arduboy.nextFrame())
         return;
 
     arduboy.clear();
