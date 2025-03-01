@@ -350,9 +350,10 @@ public:
 
     void DrawMapComplete(uint8_t mapNum, const Map &map, uint8_t strokes, int8_t totalOverUnder)
     {
-        String gameTotal = String(F("game total: ")) + totalOverUnder;
+        String gameTotal = String(F("game total: "));
         if (totalOverUnder > 0)
             gameTotal += "+";
+        gameTotal += totalOverUnder;
 
         _font4x6.setCursorY(8);
         PrintCenteredWithBackground(String(F("Hole ")) + mapNum + F((" Complete!\n")) +
@@ -375,9 +376,10 @@ public:
     {
         int8_t totalOverUnder = totalStrokes - totalPar;
 
-        String gameTotal = String(F("Total:   ")) + totalOverUnder;
+        String gameTotal = String(F("Total:   "));
         if (totalOverUnder > 0)
             gameTotal += "+";
+        gameTotal += totalOverUnder;
 
         _font4x6.setCursorY(7);
         PrintCenteredWithBackground(String(F("All Holes Complete!\n\n")) +
