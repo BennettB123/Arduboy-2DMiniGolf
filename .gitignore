@@ -4,3 +4,6 @@
 # FX related files
 src/FX/fxdata-data.bin
 src/FX/fxdata.bin
+
+# Game releases
+/releases
