@@ -45,8 +45,8 @@ void PlayCreditsAnimation(Arduboy2Base arduboy)
         displayCreditsSprite();
     }
 
-    // move right till off screen
-    while (x < WIDTH)
+    // move off screen
+    while (x < WIDTH + 60)
     {
         if (arduboy.justPressed(A_BUTTON) | arduboy.justPressed(B_BUTTON))
             return;
